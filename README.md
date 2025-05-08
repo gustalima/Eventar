@@ -1,32 +1,36 @@
 > Current Stable Version: 1.0.3
 
-# 🗓️ **Eventar: The Modern React Calendar Library**  
+# 🗓️ **Eventar: The Modern React Calendar Library**
 
-**A powerful, customizable, and lightweight React calendar component with seamless event management.**  
+**A powerful, customizable, and lightweight React calendar component with seamless event management.**
 
 ```jsx
 // Your calendar, simplified!
-<Eventar events={events} views={["day", "week", "month", "year"]} theme="light" />
+<Eventar
+  events={events}
+  views={["day", "week", "month", "year"]}
+  theme="light"
+/>
 ```
 
 ---
 
-## ✨ **Why Eventar?**  
+## ✨ **Why Eventar?**
 
-- 🗓️ **Multiple Calendar Views** – Switch between Day, Week, Month, and Year effortlessly.  
-- 🌈 **Light & Dark Mode** – Seamlessly adapt to user preferences.  
-- ⚡ **Blazing Fast Performance** – Optimized rendering for smooth navigation.  
-- 🎠 **Framer Motion Animations** – Modern and sleek transitions.  
-- 📱 **Fully Responsive** – Works flawlessly on all screen sizes.  
-- 🌟 **Event Filtering & Color Coding** – Categorize and highlight events.  
-- 🔒 **Type-Safe with TypeScript** – Reliable and developer-friendly.  
-- 🎉 **Customizable Event Display** – Use your own modals or components.  
+- 🗓️ **Multiple Calendar Views** – Switch between Day, Week, Month, and Year effortlessly.
+- 🌈 **Light & Dark Mode** – Seamlessly adapt to user preferences.
+- ⚡ **Blazing Fast Performance** – Optimized rendering for smooth navigation.
+- 🎠 **Framer Motion Animations** – Modern and sleek transitions.
+- 📱 **Fully Responsive** – Works flawlessly on all screen sizes.
+- 🌟 **Event Filtering & Color Coding** – Categorize and highlight events.
+- 🔒 **Type-Safe with TypeScript** – Reliable and developer-friendly.
+- 🎉 **Customizable Event Display** – Use your own modals or components.
 - 🛠️ **Resource Management** - Supports management of events based on resources
 - 🌟 **Special Days Highlighting** – Easily mark and distinguish important dates.
 
 ---
 
-## 🚀 **Installation**  
+## 🚀 **Installation**
 
 ```bash
 npm install eventar
@@ -38,7 +42,7 @@ pnpm add eventar
 
 ---
 
-## 📚 **Quick Start Guide**  
+## 📚 **Quick Start Guide**
 
 ```jsx
 import { Eventar } from "eventar";
@@ -61,15 +65,14 @@ function App() {
 
 ---
 
-## 🎨 **CSS Styling**  
+## 🎨 **CSS Styling**
 
-Eventar comes with built-in styles, but you can fully customize the appearance using CSS. **Make sure to import the default styles** from the `dist` folder:
+Using MUI v7 for styling
 
-```js
-import "eventar/dist/eventar.css";
-```
+---
 
-### **Theming**  
+### **Theming**
+
 You can switch between **light** and **dark** themes by passing the `theme` prop:
 
 ```jsx
@@ -78,29 +81,29 @@ You can switch between **light** and **dark** themes by passing the `theme` prop
 
 ---
 
-## 🎓 **API Reference**  
+## 🎓 **API Reference**
 
-### **`<Eventar>` Props**  
+### **`<Eventar>` Props**
 
 | Prop                 | Required | Type                            | Default                 | Description                                                                 |
 | -------------------- | -------- | ------------------------------- | ----------------------- | --------------------------------------------------------------------------- |
-| `events`             | ✅        | `Array`                         | `[]`                    | Array of events to display                                                  |
-| `views`              | ✅        | `Array`                         | `["day","month"]`       | Available views for the calendar                                            |
-| `isLoading`          | ✅        | `boolean`                       | `false`                 | Show loading spinner while fetching events                                  |
-| `error`              | ✅        | `string`                        | `null`                  | Error message to display in case of fetch error                             |
-| `defaultView`        | ❌        | `string`                        | `"month"`               | Default visible view on calendar render                                     |
-| `theme`              | ❌        | `string`                        | `"light"`               | Theme of the calendar, can be "light" or "dark"                             |
-| `navigation`         | ❌        | `boolean`                       | `true`                  | Enable/disable navigation buttons                                           |
-| `showPastDates`      | ❌        | `boolean`                       | `true`                  | Show/hide past dates in the calendar                                        |
-| `yearRange`          | ❌        | `Array`                         | `["2024"]`              | Range of years to display in the Year view                                  |
-| `spinnerComponent`   | ❌        | `SpinnerVariant`                | `SpinnerVariant.SQUARE` | Custom spinner component to display while loading                           |
-| `customViewerModal`  | ❌        | `(event: Event) => JSX.Element` | `null`                  | Custom modal component to display event details                             |
-| `defaultModalConfig` | ❌        | `DefaultModalConfig`            | `{}`                    | Default configuration for event modal, if customViewerModal is not provided |
-| `showAgenda`         | ❌        | `boolean`                       | `true`                  | Show/hide agenda view in the calendar                                       |
-| `resources`          | ❌        | `Array : Resource[]`            | `[]`                    | Array of resources (rooms, people, etc.)                                    |
-| `showClock`          | ❌        | `boolean`                       | `false`                 | Display live clock with emoji indicator                                     |
-| `specialDays`        | ❌        | `Array : SpecialDay[]`          | `[]`                    | Custom special days to highlight in the calendar                            |
-
+| `events`             | ✅       | `Array`                         | `[]`                    | Array of events to display                                                  |
+| `views`              | ✅       | `Array`                         | `["day","month"]`       | Available views for the calendar                                            |
+| `isLoading`          | ✅       | `boolean`                       | `false`                 | Show loading spinner while fetching events                                  |
+| `error`              | ✅       | `string`                        | `null`                  | Error message to display in case of fetch error                             |
+| `defaultView`        | ❌       | `string`                        | `"month"`               | Default visible view on calendar render                                     |
+| `theme`              | ❌       | `string`                        | `"light"`               | Theme of the calendar, can be "light" or "dark"                             |
+| `navigation`         | ❌       | `boolean`                       | `true`                  | Enable/disable navigation buttons                                           |
+| `showPastDates`      | ❌       | `boolean`                       | `true`                  | Show/hide past dates in the calendar                                        |
+| `yearRange`          | ❌       | `Array`                         | `["2024"]`              | Range of years to display in the Year view                                  |
+| `spinnerComponent`   | ❌       | `SpinnerVariant`                | `SpinnerVariant.SQUARE` | Custom spinner component to display while loading                           |
+| `customViewerModal`  | ❌       | `(event: Event) => JSX.Element` | `null`                  | Custom modal component to display event details                             |
+| `defaultModalConfig` | ❌       | `DefaultModalConfig`            | `{}`                    | Default configuration for event modal, if customViewerModal is not provided |
+| `showAgenda`         | ❌       | `boolean`                       | `true`                  | Show/hide agenda view in the calendar                                       |
+| `resources`          | ❌       | `Array : Resource[]`            | `[]`                    | Array of resources (rooms, people, etc.)                                    |
+| `showClock`          | ❌       | `boolean`                       | `false`                 | Display live clock with emoji indicator                                     |
+| `specialDays`        | ❌       | `Array : SpecialDay[]`          | `[]`                    | Custom special days to highlight in the calendar                            |
+| `startOfWeek`        | ❌       | `string:`                       | `Mon`                   | Display calendars starting on the week day                                  |
 
 ```typescript
 interface Resource {
@@ -117,11 +120,12 @@ interface SpecialDay {
   type: string;
 }
 ```
+
 ---
 
 ## 📊 **Resource Management**
 
-Eventar supports resource-based scheduling for managing rooms, equipment, etc. 
+Eventar supports resource-based scheduling for managing rooms, equipment, etc.
 
 ```jsx
 const resources = [
@@ -136,7 +140,7 @@ const resources = [
     name: "Meeting Room B",
     type: "room",
     description: "Meeting Room B",
-  }
+  },
 ];
 
 const events = [
@@ -146,25 +150,26 @@ const events = [
     start: new Date("2024-03-15T10:00:00"),
     end: new Date("2024-03-15T11:00:00"),
     resourceId: "room-1",
-    color: "blue"
-  }
+    color: "blue",
+  },
 ];
 
-<Eventar 
+<Eventar
   events={events}
   isLoading={false}
   error={null}
   views={["day", "week", "month"]}
   theme="light"
   resources={resources}
-/>
+/>;
 ```
 
-## 🌟 **Special Days**  
+## 🌟 **Special Days**
 
 Eventar allows you to highlight special days in the calendar, such as holidays, birthdays, or any other significant dates. You can pass an array of `specialDays` to the `Eventar` component.
 
-### **SpecialDay Interface**  
+### **SpecialDay Interface**
+
 ```typescript
 interface SpecialDay {
   date: string;
@@ -174,7 +179,8 @@ interface SpecialDay {
 }
 ```
 
-### **Usage Example**  
+### **Usage Example**
+
 ```jsx
 const specialDays = [
   {
@@ -196,7 +202,7 @@ const specialDays = [
   specialDays={specialDays}
   views={["month", "week"]}
   theme="light"
-/>
+/>;
 ```
 
 Special days will be highlighted in the calendar, making it easy to distinguish them from regular events.
@@ -204,6 +210,7 @@ Special days will be highlighted in the calendar, making it easy to distinguish 
 ---
 
 ## 🎨 **Customization**
+
 ### **`<CustomViewerModal>` Component**
 
 - By default Eventar has 3 built-in custom modal components: `SimpleEventModal`, `CompactEventModal`, and `CardEventModal`. Import them from the `Modals` object so that you can use these components by passing in the `CustomViewerModal` prop, or create your own custom modal component.
@@ -241,11 +248,12 @@ Special days will be highlighted in the calendar, making it easy to distinguish 
   )}
 ```
 
-## 📈 **Data Fetching Hooks**  
+## 📈 **Data Fetching Hooks**
 
 Eventar provides custom hooks to fetch events and resources from an API.
 
 ### `useEvents` hook fetches events from an API and transforms the data to the required format.
+
 ```jsx
 import { useEvents } from "Eventar";
 
@@ -253,7 +261,7 @@ function Calendar() {
   const { events, isLoading, error } = useEvents({
     endpoint: "your-api-endpoint",
     refactorData: (data) =>
-     // Transform your API data to CalendarEvent[]
+      // Transform your API data to CalendarEvent[]
       data.map((item) => ({
         id: item.id,
         title: item.title,
@@ -267,21 +275,24 @@ function Calendar() {
 ```
 
 ### `useResources` hook used to fetch resources from an API endpoint.
+
 ```jsx
 import { useResources } from "Eventar";
 
 function Calendar() {
-  const {
-    resources,
-    error,
-    isLoading,
-  } = useResources({
+  const { resources, error, isLoading } = useResources({
     endpoint: "your-api-endpoint",
     delay: 1000,
   });
 
-
-  return <Eventar events={events} resources={resources} isLoading={isLoading} error={error} />;
+  return (
+    <Eventar
+      events={events}
+      resources={resources}
+      isLoading={isLoading}
+      error={error}
+    />
+  );
 }
 ```
 
@@ -347,14 +358,13 @@ function Calendar() {
 
 ---
 
-
-## 📝 **License**  
+## 📝 **License**
 
 Licensed under MIT
 
 ---
 
-## 🤝 **Contributing**  
+## 🤝 **Contributing**
 
 Got ideas for new features? Found a bug? PRs and issues are welcome! Check the [issues page](https://github.com/yasirmansoori/Eventar/issues).
 
