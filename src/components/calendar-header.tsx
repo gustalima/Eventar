@@ -1,8 +1,15 @@
+import {
+  Box,
+  Button,
+  FormControlLabel,
+  Switch,
+  Typography,
+} from "@mui/material";
+import { grey } from "@mui/material/colors";
 import { useEffect, useState } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { FilterPopover } from "@/components/filter-popover";
 import { Navigation } from "@/components/navigation";
-import { Button } from "@/components/ui/button";
 import { CalendarHeaderProps } from "@/types/calendar";
 import { ResourceSelector } from "./resource-selector";
 import { ViewOptions } from "./view-options";
@@ -42,6 +49,95 @@ export function CalendarHeader({
     setCurrentDate(new Date());
   };
 
+  return (
+    <ErrorBoundary>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          pb: 2,
+        }}
+        id="calendar-header"
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          {/* Navigation */}
+          {navigation && (
+            <Navigation
+              currentDate={currentDate}
+              setCurrentDate={setCurrentDate}
+              view={view}
+              availableYears={availableYears}
+            />
+          )}
+
+          {/* Clock */}
+          {showClock && <ClockComponent />}
+
+          {/* View Options and Actions */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              marginLeft: "auto",
+            }}
+          >
+            <ResourceSelector
+              resources={resources}
+              selectedResource={selectedResource}
+              onResourceChange={onResourceChange}
+            />
+
+            <FilterPopover
+              selectedColors={selectedColors}
+              onColorToggle={onColorToggle}
+              colors={availableColors}
+            />
+            {showAgenda && (
+              <FormControlLabel
+                sx={{ ml: 0.5 }}
+                control={
+                  <Switch
+                    checked={agendaView}
+                    onClick={() => handleAgendaView?.(!showAgenda)}
+                    slotProps={{ input: { "aria-label": "controlled" } }}
+                  />
+                }
+                label="Agenda"
+              />
+            )}
+            <Button
+              onClick={handleTodayClick}
+              sx={{ height: 40 }}
+              variant={
+                currentDate.toDateString() === new Date().toDateString()
+                  ? "contained"
+                  : "outlined"
+              }
+            >
+              Today
+            </Button>
+
+            <ViewOptions
+              view={view}
+              setView={setView}
+              showViewOptions={showViewOptions}
+            />
+          </Box>
+        </Box>
+      </Box>
+    </ErrorBoundary>
+  );
+}
+function ClockComponent() {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -58,79 +154,29 @@ export function CalendarHeader({
     if (hours >= 17 && hours < 20) return "🌇";
     return "🌙";
   };
-
   return (
-    <ErrorBoundary>
-      <header className="flex flex-col gap-4 p-4 border-b" id="calendar-header">
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Navigation */}
-          {navigation && (
-            <Navigation
-              currentDate={currentDate}
-              setCurrentDate={setCurrentDate}
-              view={view}
-              availableYears={availableYears}
-            />
-          )}
-
-          {/* Clock */}
-          {showClock && (
-            <div className="flex items-center gap-2 text-lg font-semibold border border-zinc-200 rounded-md p-1 px-2">
-              <span>{getTimeEmoji(time.getHours())}</span>
-              <span>
-                {time.toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                })}
-              </span>
-            </div>
-          )}
-
-          {/* View Options */}
-          <div className="flex items-center gap-2 ml-auto">
-            <ResourceSelector
-              resources={resources}
-              selectedResource={selectedResource}
-              onResourceChange={onResourceChange}
-            />
-
-            <FilterPopover
-              selectedColors={selectedColors}
-              onColorToggle={onColorToggle}
-              colors={availableColors}
-            />
-
-            <Button
-              size="md"
-              onClick={handleTodayClick}
-              variant={
-                currentDate.toDateString() === new Date().toDateString()
-                  ? "default"
-                  : "outline"
-              }
-            >
-              Today
-            </Button>
-
-            {showAgenda && (
-              <Button
-                size="md"
-                onClick={() => handleAgendaView?.(!showAgenda)}
-                variant={agendaView ? "default" : "outline"}
-              >
-                Agenda
-              </Button>
-            )}
-
-            <ViewOptions
-              view={view}
-              setView={setView}
-              showViewOptions={showViewOptions}
-            />
-          </div>
-        </div>
-      </header>
-    </ErrorBoundary>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 1,
+        fontSize: "1.125rem",
+        border: 1,
+        borderColor: grey[400],
+        borderRadius: 1,
+        p: 0.5,
+        px: 1.5,
+        height: 40,
+      }}
+    >
+      <span>{getTimeEmoji(time.getHours())}</span>
+      <Typography variant="body1" sx={{ fontWeight: 600 }}>
+        {time.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        })}
+      </Typography>
+    </Box>
   );
 }

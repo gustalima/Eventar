@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { SpinnerVariant } from "./spinner.types";
 
 export type CalendarEvent = {
@@ -11,7 +12,7 @@ export type CalendarEvent = {
   batch?: string;
   course?: string;
   duration?: number; // in hours, For example, 1.5 hours
-  color?: "blue" | "green" | "yellow" | "purple" | "red";
+  color?: string;
   isFullDay?: boolean;
   status?: "confirmed" | "tentative" | "cancelled";
   location?: string;
@@ -78,6 +79,7 @@ export interface EventarProps {
   showClock?: boolean;
   resources?: Resource[];
   specialDays?: SpecialDay[];
+  startOfWeek?: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
 }
 
 export interface RenderViewProps {
@@ -95,6 +97,7 @@ export interface RenderViewProps {
   setIsEventModalOpen: (isOpen: boolean) => void;
   agendaView: boolean;
   specialDays: SpecialDay[];
+  startOfWeek: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
 }
 
 export interface CalendarHeaderProps {

@@ -1,6 +1,6 @@
+import { Box, Paper, Typography } from "@mui/material";
 import { format } from "date-fns";
-import { motion } from "framer-motion";
-import { getEventBackgroundColorClass } from "@/utils/color-utils";
+import { getBackgroundColor } from "@/utils/color-utils";
 import { CalendarEvent } from "@/types/calendar";
 
 interface AgendaViewProps {
@@ -14,46 +14,51 @@ export const AgendaView = ({ events, handleEventClick }: AgendaViewProps) => {
   );
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
-      className="w-full"
-    >
-      <div className="mb-6 px-4">
-        <h1 className="text-2xl font-bold text-gray-800">Agenda View</h1>
-        <p className="text-gray-600 mt-1">
+    <Box sx={{ width: "100%" }}>
+      <Box sx={{ mb: 6, px: 2 }}>
+        <Typography variant="h4" fontWeight="bold" color="grey.800">
+          Agenda View
+        </Typography>
+        <Typography color="grey.600" mt={1}>
           View your upcoming events in chronological order
-        </p>
-      </div>
-      <div className="space-y-2">
+        </Typography>
+      </Box>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         {sortedEvents.length === 0 ? (
-          <div className="text-center p-8 text-gray-500">
-            <p>No events scheduled. Time to add some!</p>
-          </div>
+          <Box sx={{ textAlign: "center", p: 8, color: "grey.500" }}>
+            <Typography>No events scheduled. Time to add some!</Typography>
+          </Box>
         ) : (
-          sortedEvents.map((event, index) => (
-            <motion.div
+          sortedEvents.map((event) => (
+            <Paper
               key={event.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1, duration: 0.2 }}
               onClick={(e) => handleEventClick(e, event)}
-              className={`flex items-center p-3 rounded-lg shadow-sm cursor-pointer ${getEventBackgroundColorClass(
-                event.color
-              )} transition-all duration-200 hover:brightness-95 hover:shadow-md`}
+              elevation={1}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                p: 3,
+                borderRadius: 2,
+                cursor: "pointer",
+                transition: "all 0.2s",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.07)",
+                "&:hover": {
+                  filter: "brightness(0.95)",
+                  boxShadow: 3,
+                },
+                ...getBackgroundColor(event.color, 0.7),
+              }}
             >
-              <div className="flex-1">
-                <h3 className="font-semibold">{event.title}</h3>
-                <p className="text-sm text-gray-600">
+              <Box sx={{ flex: 1 }}>
+                <Typography fontWeight={600}>{event.title}</Typography>
+                <Typography variant="body2">
                   {format(new Date(event.start), "PPp")}
-                </p>
-              </div>
-            </motion.div>
+                </Typography>
+              </Box>
+            </Paper>
           ))
         )}
-      </div>
-    </motion.div>
+      </Box>
+    </Box>
   );
 };

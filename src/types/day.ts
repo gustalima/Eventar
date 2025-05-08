@@ -12,6 +12,7 @@ export interface DayViewProps {
 
 export interface DayCellProps {
   date: Date;
+  mappedDate: Date;
   index: number;
   events: CalendarEvent[];
   showPastDates: boolean;

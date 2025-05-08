@@ -1,3 +1,4 @@
+import { Box, Button, Typography } from "@mui/material";
 import React, { Component, ErrorInfo, ReactNode } from "react";
 
 interface ErrorBoundaryProps {
@@ -38,33 +39,68 @@ export class ErrorBoundary extends Component<
       }
 
       return (
-        <div className="p-4 rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800">
-          <div className="flex items-center space-x-2">
-            <svg
-              className="w-5 h-5 text-red-500"
+        <Box
+          sx={{
+            p: 2,
+            borderRadius: 1,
+            border: 1,
+            borderColor: (theme) =>
+              theme.palette.mode === "dark" ? "red.800" : "red.200",
+            backgroundColor: (theme) =>
+              theme.palette.mode === "dark" ? "rgba(153,27,27,0.2)" : "red.50",
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box
+              component="svg"
               viewBox="0 0 20 20"
               fill="currentColor"
+              sx={{ width: 20, height: 20, color: "red.500" }}
             >
               <path
                 fillRule="evenodd"
                 d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                 clipRule="evenodd"
               />
-            </svg>
-            <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+            </Box>
+            <Typography
+              component="h3"
+              variant="body2"
+              sx={{
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "red.200" : "red.800",
+              }}
+            >
               Something went wrong
-            </h3>
-          </div>
-          <div className="mt-2 text-sm text-red-700 dark:text-red-300">
+            </Typography>
+          </Box>
+          <Typography
+            variant="body2"
+            sx={{
+              mt: 2,
+              color: (theme) =>
+                theme.palette.mode === "dark" ? "red.300" : "red.700",
+            }}
+          >
             {this.state.error?.message}
-          </div>
-          <button
+          </Typography>
+          <Button
+            variant="text"
             onClick={this.handleRetry}
-            className="mt-3 text-sm text-red-600 hover:text-red-500 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+            sx={{
+              mt: 3,
+              fontSize: "0.875rem",
+              color: (theme) =>
+                theme.palette.mode === "dark" ? "red.400" : "red.600",
+              "&:hover": {
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "red.300" : "red.500",
+              },
+            }}
           >
             Try again
-          </button>
-        </div>
+          </Button>
+        </Box>
       );
     }
 

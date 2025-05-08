@@ -12,27 +12,53 @@ export function getDateClassName(
   showPastDates: boolean,
   view: CalendarView
 ) {
-  if (!showPastDates && isPastDate(date)) {
+  if (isPastDate(date)) {
     switch (view) {
       case "day":
-        return "opacity-50 pointer-events-none text-gray-400";
       case "week":
-        return "opacity-50 pointer-events-none text-gray-400";
       case "month":
-        return "opacity-50 pointer-events-none text-gray-400";
+        return {
+          opacity: 0.5,
+          pointerEvents: "none",
+          color: "#9ca3af",
+        };
       case "year":
-        return "opacity-40 pointer-events-none text-gray-400";
+        return {
+          opacity: 0.4,
+          pointerEvents: "none",
+          color: "#9ca3af",
+        };
     }
   }
-  return "";
+  return {};
 }
 
-export function getMonthDays(year: number, month: number): Date[] {
+export function getMonthDays(
+  year: number,
+  month: number,
+  startOfWeek: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun" = "Mon"
+): Date[] {
   const days: Date[] = [];
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
+  const weekDays = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+  const startIdx = weekDays.indexOf(startOfWeek.toLowerCase());
+  if (startIdx === -1) throw new Error("Invalid startOfWeek value");
 
-  for (let d = firstDay; d <= lastDay; d.setDate(d.getDate() + 1)) {
+  const firstDayOfMonth = new Date(year, month, 1);
+  const lastDayOfMonth = new Date(year, month + 1, 0);
+
+  const firstDayOfWeek = new Date(firstDayOfMonth);
+  let diff = (firstDayOfMonth.getDay() - startIdx + 7) % 7;
+  firstDayOfWeek.setDate(firstDayOfMonth.getDate() - diff);
+
+  const lastDayOfWeek = new Date(lastDayOfMonth);
+  diff = (startIdx + 6 - lastDayOfMonth.getDay() + 7) % 7;
+  lastDayOfWeek.setDate(lastDayOfMonth.getDate() + diff);
+
+  for (
+    let d = new Date(firstDayOfWeek);
+    d <= lastDayOfWeek;
+    d.setDate(d.getDate() + 1)
+  ) {
     days.push(new Date(d));
   }
 

@@ -1,3 +1,4 @@
+import { Box, Typography } from "@mui/material";
 import { isSpecialDay } from "@/utils/date-utils";
 import type { CalendarEvent, RenderViewProps } from "@/types/calendar";
 import { AgendaView } from "../views/agenda-view/agenda-view";
@@ -7,7 +8,7 @@ import { WeekView } from "../views/week-view/week-view";
 import { YearView } from "../views/year-view/year-view";
 import LoadingState from "./LoadingState";
 
-export const renderView = ({
+export const RenderView = ({
   view,
   currentDate,
   filteredEvents,
@@ -22,15 +23,36 @@ export const renderView = ({
   setIsEventModalOpen,
   agendaView,
   specialDays,
+  startOfWeek,
 }: RenderViewProps) => {
   if (error) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-red-500 text-center">
-          <h3 className="text-lg font-semibold mb-2">Error</h3>
-          <p>{error}</p>
-        </div>
-      </div>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "24rem",
+        }}
+      >
+        <Box
+          style={{
+            color: "#f44336",
+            textAlign: "center",
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: "1.125rem",
+              fontWeight: 600,
+              marginBottom: "0.5rem",
+            }}
+          >
+            Error
+          </Typography>
+          <Typography>{error}</Typography>
+        </Box>
+      </Box>
     );
   }
 
@@ -61,6 +83,7 @@ export const renderView = ({
           showPastDates={showPastDates}
           handleEventClick={handleEventClick}
           specialDays={specialDays}
+          startOfWeek={startOfWeek}
         />
       );
     case "month":
@@ -80,6 +103,7 @@ export const renderView = ({
           handleEventClick={handleEventClick}
           handleDayClick={handleDayClick}
           specialDays={specialDays}
+          startOfWeek={startOfWeek}
         />
       );
     case "week":
@@ -95,6 +119,7 @@ export const renderView = ({
           showPastDates={showPastDates}
           handleEventClick={handleEventClick}
           specialDays={specialDays}
+          startOfWeek={startOfWeek}
         />
       );
     case "day":

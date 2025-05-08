@@ -1,5 +1,8 @@
-import { Grid, LayoutGrid, List, Table2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import TableViewIcon from "@mui/icons-material/TableView";
+import ViewWeekIcon from "@mui/icons-material/ViewWeek";
+import { ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import type { CalendarView, ViewOptionsProps } from "@/types/calendar";
 
 export function ViewOptions({
@@ -8,10 +11,10 @@ export function ViewOptions({
   showViewOptions,
 }: ViewOptionsProps) {
   const allViewOptions = [
-    { value: "month", label: "Month", icon: LayoutGrid },
-    { value: "week", label: "Week", icon: Grid },
-    { value: "day", label: "Day", icon: List },
-    { value: "year", label: "Year", icon: Table2 },
+    { value: "month", label: "Month", icon: CalendarMonthIcon },
+    { value: "week", label: "Week", icon: ViewWeekIcon },
+    { value: "day", label: "Day", icon: FormatListBulletedIcon },
+    { value: "year", label: "Year", icon: TableViewIcon },
   ];
 
   const viewOptions = allViewOptions.filter((option) =>
@@ -19,7 +22,17 @@ export function ViewOptions({
   );
 
   return (
-    <div className="flex items-center rounded-lg border border-zinc-200 p-1 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+    <ToggleButtonGroup
+      value={view}
+      exclusive
+      onChange={(_, newView) => {
+        if (newView !== null) setView(newView as CalendarView);
+      }}
+      sx={{
+        backgroundColor: "background.paper",
+        height: 40,
+      }}
+    >
       {viewOptions
         .sort(
           (a, b) =>
@@ -29,18 +42,28 @@ export function ViewOptions({
         .map((option) => {
           const Icon = option.icon;
           return (
-            <Button
+            <ToggleButton
               key={option.value}
-              variant={view === option.value ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setView(option.value as CalendarView)}
-              className="px-2 mx-0.5 transition-colors duration-200"
+              value={option.value}
+              sx={{
+                px: 2,
+                display: "flex",
+                alignItems: "center",
+                height: 40,
+              }}
             >
-              <Icon className="h-4 w-4" />
-              <span className="ml-2 hidden md:inline">{option.label}</span>
-            </Button>
+              <Icon />
+              <Typography
+                sx={{
+                  ml: 1.5,
+                  display: { xs: "none", md: "inline" },
+                }}
+              >
+                {option.label}
+              </Typography>
+            </ToggleButton>
           );
         })}
-    </div>
+    </ToggleButtonGroup>
   );
 }

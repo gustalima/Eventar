@@ -1,19 +1,25 @@
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import CheckIcon from "@mui/icons-material/Check";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Button,
+  Typography,
+} from "@mui/material";
 import { format } from "date-fns";
-import { motion } from "framer-motion";
-import { Check, ChevronDown, Clock, Copy, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { getBackgroundColor } from "@/utils/color-utils";
 import { CalendarEvent } from "@/types/calendar";
 
 export default function CompactEventModal({ event }: { event: CalendarEvent }) {
   const [copied, setCopied] = useState(false);
-  const [openSection, setOpenSection] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<string | false>(false);
 
   const handleCopyLink = async () => {
     if (event.meetingLink) {
@@ -29,27 +35,46 @@ export default function CompactEventModal({ event }: { event: CalendarEvent }) {
     return `${hours}h ${minutes}m`;
   };
 
-  const colorVariants = {
-    blue: "border-l-blue-500",
-    green: "border-l-green-500",
-    yellow: "border-l-yellow-500",
-    purple: "border-l-purple-500",
-    red: "border-l-red-500",
-  };
+  const handleAccordionChange =
+    (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
+      setExpanded(isExpanded ? panel : false);
+    };
 
   return (
-    <motion.div
-      initial={{ scale: 0.95, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      exit={{ scale: 0.95, opacity: 0 }}
-      className={`w-full bg-white dark:bg-zinc-900 rounded-lg shadow-xl border-l-4 ${
-        colorVariants[event.color ?? "blue"]
-      }`}
+    <Box
+      sx={{
+        ...getBackgroundColor(event.color, 0.7),
+        width: "100%",
+        bgcolor: "background.paper",
+        borderRadius: 2,
+        boxShadow: 3,
+        borderLeft: "4px solid",
+        borderLeftColor: getBackgroundColor(event.color, 1).backgroundColor,
+        overflow: "hidden",
+      }}
     >
       {/* Header */}
-      <div className="p-4 border-b dark:border-zinc-800">
-        <div className="flex items-start justify-between mb-2">
-          <h2 className="text-lg font-semibold">{event.title}</h2>
+      <Box
+        sx={{
+          p: 2,
+          borderBottom: 1,
+          borderColor: "divider",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            mb: 1,
+          }}
+        >
+          <Box
+            component="h2"
+            sx={{ fontSize: "1.125rem", fontWeight: 600, m: 0 }}
+          >
+            {event.title}
+          </Box>
           {event.status && (
             <Badge
               variant={event.status === "confirmed" ? "default" : "secondary"}
@@ -57,17 +82,29 @@ export default function CompactEventModal({ event }: { event: CalendarEvent }) {
               {event.status}
             </Badge>
           )}
-        </div>
-        <div className="flex flex-wrap gap-2">
+        </Box>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
           {event.course && <Badge variant="outline">{event.course}</Badge>}
           {event.batch && <Badge variant="outline">{event.batch}</Badge>}
-        </div>
-      </div>
+        </Box>
+      </Box>
 
       {/* Quick Info */}
-      <div className="p-4 bg-zinc-50 dark:bg-zinc-800/50">
-        <div className="flex items-center gap-3 text-sm">
-          <Clock className="h-4 w-4 text-zinc-500" />
+      <Box
+        sx={{
+          p: 2,
+          bgcolor: "action.hover",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
+            fontSize: "0.875rem",
+          }}
+        >
+          <AccessTimeIcon sx={{ height: 16, width: 16, color: "#71717a" }} />
           <span>
             {format(new Date(event.start), "EEE, MMM d")}
             {!event.isFullDay && (
@@ -78,28 +115,39 @@ export default function CompactEventModal({ event }: { event: CalendarEvent }) {
               </>
             )}
           </span>
-        </div>
-      </div>
+        </Box>
+      </Box>
 
-      {/* Collapsible Sections */}
-      <div className="divide-y dark:divide-zinc-800">
+      {/* Accordions */}
+      <Box sx={{ borderTop: 0, borderBottom: 0 }}>
         {/* Time Details */}
-        <Collapsible
-          open={openSection === "time"}
-          onOpenChange={() =>
-            setOpenSection(openSection === "time" ? null : "time")
-          }
+        <Accordion
+          expanded={expanded === "time"}
+          onChange={handleAccordionChange("time")}
+          sx={{ boxShadow: "none", borderBottom: 1, borderColor: "divider" }}
         >
-          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
-            <span className="font-medium">Time Details</span>
-            <ChevronDown
-              className={`h-4 w-4 transition-transform ${
-                openSection === "time" ? "rotate-180" : ""
-              }`}
-            />
-          </CollapsibleTrigger>
-          <CollapsibleContent className="p-4 pt-0 text-sm space-y-2">
-            <p>
+          <AccordionSummary
+            expandIcon={
+              <ExpandMoreIcon
+                sx={{
+                  height: 16,
+                  width: 16,
+                  transition: "transform 0.2s",
+                  transform: expanded === "time" ? "rotate(180deg)" : undefined,
+                }}
+              />
+            }
+            sx={{
+              p: 2,
+              fontSize: "0.875rem",
+              "& .MuiAccordionSummary-content": { margin: 0 },
+              "&:hover": { bgcolor: "action.hover" },
+            }}
+          >
+            <Typography sx={{ fontWeight: 500 }}>Time Details</Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ p: 2, pt: 0, fontSize: "0.875rem" }}>
+            <Box>
               Duration:{" "}
               {event.duration
                 ? getTimeFormatFromDuration(event.duration)
@@ -108,118 +156,175 @@ export default function CompactEventModal({ event }: { event: CalendarEvent }) {
                       new Date(event.start).getTime()) /
                       3600000
                   )}
-            </p>
+            </Box>
             {event.recurring && (
-              <p className="text-zinc-500">Recurring event</p>
+              <Box sx={{ color: "text.secondary" }}>Recurring event</Box>
             )}
-          </CollapsibleContent>
-        </Collapsible>
+          </AccordionDetails>
+        </Accordion>
 
         {/* Location */}
         {event.location && (
-          <Collapsible
-            open={openSection === "location"}
-            onOpenChange={() =>
-              setOpenSection(openSection === "location" ? null : "location")
-            }
+          <Accordion
+            expanded={expanded === "location"}
+            onChange={handleAccordionChange("location")}
+            sx={{ boxShadow: "none", borderBottom: 1, borderColor: "divider" }}
           >
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-4 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
-              <span className="font-medium">Location</span>
-              <ChevronDown
-                className={`h-4 w-4 transition-transform ${
-                  openSection === "location" ? "rotate-180" : ""
-                }`}
-              />
-            </CollapsibleTrigger>
-            <CollapsibleContent className="p-4 pt-0 text-sm space-y-2">
-              <p>{event.location}</p>
+            <AccordionSummary
+              expandIcon={
+                <ExpandMoreIcon
+                  sx={{
+                    height: 16,
+                    width: 16,
+                    transition: "transform 0.2s",
+                    transform:
+                      expanded === "location" ? "rotate(180deg)" : undefined,
+                  }}
+                />
+              }
+              sx={{
+                p: 2,
+                fontSize: "0.875rem",
+                "& .MuiAccordionSummary-content": { margin: 0 },
+                "&:hover": { bgcolor: "action.hover" },
+              }}
+            >
+              <Typography sx={{ fontWeight: 500 }}>Location</Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ p: 2, pt: 0, fontSize: "0.875rem" }}>
+              <Box>{event.location}</Box>
               {event.locationDetail && (
-                <p className="text-zinc-500">{event.locationDetail}</p>
+                <Box sx={{ color: "text.secondary" }}>
+                  {event.locationDetail}
+                </Box>
               )}
-            </CollapsibleContent>
-          </Collapsible>
+            </AccordionDetails>
+          </Accordion>
         )}
 
         {/* Description */}
         {event.description && (
-          <Collapsible
-            open={openSection === "description"}
-            onOpenChange={() =>
-              setOpenSection(
-                openSection === "description" ? null : "description"
-              )
-            }
+          <Accordion
+            expanded={expanded === "description"}
+            onChange={handleAccordionChange("description")}
+            sx={{ boxShadow: "none", borderBottom: 1, borderColor: "divider" }}
           >
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-4 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
-              <span className="font-medium">Description</span>
-              <ChevronDown
-                className={`h-4 w-4 transition-transform ${
-                  openSection === "description" ? "rotate-180" : ""
-                }`}
-              />
-            </CollapsibleTrigger>
-            <CollapsibleContent className="p-4 pt-0 text-sm">
-              <p className="whitespace-pre-wrap text-zinc-600 dark:text-zinc-300">
+            <AccordionSummary
+              expandIcon={
+                <ExpandMoreIcon
+                  sx={{
+                    height: 16,
+                    width: 16,
+                    transition: "transform 0.2s",
+                    transform:
+                      expanded === "description" ? "rotate(180deg)" : undefined,
+                  }}
+                />
+              }
+              sx={{
+                p: 2,
+                fontSize: "0.875rem",
+                "& .MuiAccordionSummary-content": { margin: 0 },
+                "&:hover": { bgcolor: "action.hover" },
+              }}
+            >
+              <Typography sx={{ fontWeight: 500 }}>Description</Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ p: 2, pt: 0, fontSize: "0.875rem" }}>
+              <Box
+                sx={{
+                  whiteSpace: "pre-wrap",
+                  color: "text.secondary",
+                }}
+              >
                 {event.description}
-              </p>
-            </CollapsibleContent>
-          </Collapsible>
+              </Box>
+            </AccordionDetails>
+          </Accordion>
         )}
 
         {/* Additional Info */}
         {event.additionalInfo && (
-          <Collapsible
-            open={openSection === "info"}
-            onOpenChange={() =>
-              setOpenSection(openSection === "info" ? null : "info")
-            }
+          <Accordion
+            expanded={expanded === "info"}
+            onChange={handleAccordionChange("info")}
+            sx={{ boxShadow: "none", borderBottom: 1, borderColor: "divider" }}
           >
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-4 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
-              <span className="font-medium">Additional Info</span>
-              <ChevronDown
-                className={`h-4 w-4 transition-transform ${
-                  openSection === "info" ? "rotate-180" : ""
-                }`}
-              />
-            </CollapsibleTrigger>
-            <CollapsibleContent className="p-4 pt-0 text-sm">
-              <div className="bg-zinc-50 dark:bg-zinc-800 p-3 rounded">
-                <p className="text-zinc-600 dark:text-zinc-300">
+            <AccordionSummary
+              expandIcon={
+                <ExpandMoreIcon
+                  sx={{
+                    height: 16,
+                    width: 16,
+                    transition: "transform 0.2s",
+                    transform:
+                      expanded === "info" ? "rotate(180deg)" : undefined,
+                  }}
+                />
+              }
+              sx={{
+                p: 2,
+                fontSize: "0.875rem",
+                "& .MuiAccordionSummary-content": { margin: 0 },
+                "&:hover": { bgcolor: "action.hover" },
+              }}
+            >
+              <Typography sx={{ fontWeight: 500 }}>Additional Info</Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ p: 2, pt: 0, fontSize: "0.875rem" }}>
+              <Box
+                sx={{
+                  bgcolor: "action.hover",
+                  p: 1.5,
+                  borderRadius: 1,
+                }}
+              >
+                <Box sx={{ color: "text.secondary" }}>
                   {event.additionalInfo}
-                </p>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+                </Box>
+              </Box>
+            </AccordionDetails>
+          </Accordion>
         )}
-      </div>
+      </Box>
 
       {/* Actions */}
       {event.meetingLink && (
-        <div className="p-4 border-t dark:border-zinc-800">
-          <div className="flex gap-2">
+        <Box
+          sx={{
+            p: 2,
+            borderTop: 1,
+            borderColor: "divider",
+          }}
+        >
+          <Box sx={{ display: "flex", gap: 1 }}>
             <Button
-              className="flex-1"
+              sx={{ flex: 1 }}
               onClick={() => window.open(event.meetingLink, "_blank")}
             >
-              <ExternalLink className="mr-2 h-4 w-4" />
+              <OpenInNewIcon sx={{ marginRight: 1, height: 16, width: 16 }} />
               Join Meeting
             </Button>
-            <Button variant="outline" onClick={handleCopyLink}>
+            <Button variant="outlined" onClick={handleCopyLink}>
               {copied ? (
-                <div className="flex items-center gap-1">
-                  <Check className="h-4 w-4" />
-                  <span className="sr-only">Copied</span>
-                </div>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                  <CheckIcon sx={{ height: 16, width: 16 }} />
+                  <span style={{ position: "absolute", left: -9999 }}>
+                    Copied
+                  </span>
+                </Box>
               ) : (
-                <div className="flex items-center gap-1">
-                  <Copy className="h-4 w-4" />
-                  <span className="sr-only">Copy link</span>
-                </div>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                  <ContentCopyIcon sx={{ height: 16, width: 16 }} />
+                  <span style={{ position: "absolute", left: -9999 }}>
+                    Copy link
+                  </span>
+                </Box>
               )}
             </Button>
-          </div>
-        </div>
+          </Box>
+        </Box>
       )}
-    </motion.div>
+    </Box>
   );
 }

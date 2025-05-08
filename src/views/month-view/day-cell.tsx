@@ -1,13 +1,20 @@
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import { blue, deepOrange, grey } from "@mui/material/colors";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
 import { format, isBefore, startOfDay } from "date-fns";
-import { motion } from "framer-motion";
 import { useState } from "react";
 import { SpecialDayModal } from "@/components/modals/special-day-modal";
-import { getEventBackgroundColorClass } from "@/utils/color-utils";
-import { getDateClassName } from "@/utils/date-utils";
+import {
+  getBackgroundColor,
+  getEventBackgroundColorStyle,
+} from "@/utils/color-utils";
 import { DayCellProps } from "@/types/day";
 
 export function DayCell({
   date,
+  mappedDate,
   index,
   events,
   showPastDates,
@@ -16,11 +23,13 @@ export function DayCell({
   isSpecialDay,
   specialDayContent,
 }: DayCellProps) {
-  const visibleEvents = events.slice(0, 2);
+  const visibleEvents = events.slice(0, 1);
   const remainingEvents = events.length - visibleEvents.length;
-
-  const isToday = new Date().toDateString() === date.toDateString();
-  const isPastDate = isBefore(date, startOfDay(new Date()));
+  const isSameMonth =
+    date.getMonth() === mappedDate.getMonth() &&
+    date.getFullYear() === mappedDate.getFullYear();
+  const isToday = new Date().toDateString() === mappedDate.toDateString();
+  const isPastDate = isBefore(mappedDate, startOfDay(new Date()));
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -31,73 +40,147 @@ export function DayCell({
   };
 
   return (
-    <motion.div
-      className={`min-h-[180px] p-2 m-1 border border-zinc-200 rounded relative group dark:border-zinc-800 ${getDateClassName(date, showPastDates, "month")} hover:bg-zinc-50 dark:hover:bg-zinc-900/20 hover:border-blue-500 transition-all`}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: index * 0.02 }}
+    <Box
+      sx={{
+        height: "16.666vh",
+        maxWidth: 275,
+        p: 1,
+        m: 0,
+        position: "relative",
+      }}
+      className={`day-cell ${
+        index === 0 ? "first-day" : index === 6 ? "last-day" : ""
+      }`}
     >
-      <div className="flex gap-2 items-center mb-2 justify-between">
-        <div
-          className={`font-medium ${
-            isToday
-              ? "border w-max px-2 rounded bg-black text-white dark:bg-white dark:text-black"
-              : ""
-          } ${isPastDate ? "line-through" : ""}`}
+      <Paper
+        elevation={0}
+        sx={{
+          border: 1,
+          borderWidth: isToday ? 2 : 1,
+          borderColor: isToday ? blue["A400"] : "divider",
+          borderRadius: 2,
+          ...(isPastDate && !showPastDates
+            ? { backgroundColor: isSameMonth ? grey[100] : grey[200] }
+            : { backgroundColor: isSameMonth ? "white" : grey[100] }),
+
+          transition: "all 0.2s",
+          "&:hover": {
+            backgroundColor: "action.hover",
+          },
+          height: "100%",
+          position: "relative",
+          p: 1,
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            alignItems: "center",
+            mb: 1,
+            justifyContent: "space-between",
+          }}
         >
-          {date.getDate()}
-        </div>
+          <Typography
+            variant="body1"
+            sx={{
+              ...(isToday && {
+                border: 1,
+                px: 1,
+                borderRadius: 1,
+                backgroundColor: blue[700],
+                color: "white",
+              }),
+              ...(isPastDate && !showPastDates && { color: "text.disabled" }),
 
-        {isSpecialDay && (
-          <div
-            onClick={handleSpecialDayClick}
-            className="relative px-2 before:absolute before:inset-0 before:pointer-events-none before:bg-[repeating-linear-gradient(135deg,transparent,transparent_8px,currentColor_8px,currentColor_9px)] before:opacity-[0.1] hover:before:opacity-[0.5]bg-gradient-to-br from-purple-400/20 to-pink-400/20 border-2 border-purple-500/50 shadow-lg cursor-pointer rounded"
+              width: "max-content",
+            }}
           >
-            {specialDayContent?.title}
-          </div>
-        )}
-      </div>
-      <div className="space-y-1">
-        {visibleEvents.map((event, i) => (
-          <motion.div
-            key={event.id}
-            className={`rounded p-1 text-sm cursor-pointer hover:opacity-80 ${getEventBackgroundColorClass(
-              event.color
-            )}`}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.1 }}
-            onClick={(e) => handleEventClick && handleEventClick(e, event)}
-          >
-            <div className="font-medium truncate">{event.title}</div>
-            <div className="text-xs opacity-70">
-              {event.isFullDay
-                ? "All day"
-                : `${format(event.start, "HH:mm")} - ${format(
-                    event.end,
-                    "HH:mm"
-                  )}`}
-            </div>
-          </motion.div>
-        ))}
-        {remainingEvents > 0 && (
-          <button
-            onClick={() => handleDayClick && handleDayClick(date)}
-            className="text-xs text-zinc-900 hover:text-zinc-900/80 transition-colors dark:text-zinc-50 dark:hover:text-zinc-50/80"
-          >
-            +{remainingEvents} more
-          </button>
-        )}
-      </div>
+            {mappedDate.getDate()}
+          </Typography>
 
-      {isSpecialDay && specialDayContent && (
-        <SpecialDayModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          date={date}
-          content={specialDayContent}
-        />
-      )}
-    </motion.div>
+          {isSpecialDay && (
+            <Box
+              onClick={handleSpecialDayClick}
+              sx={{
+                position: "relative",
+                px: 1,
+                border: 2,
+                borderColor: deepOrange[500],
+                borderRadius: 1,
+                backgroundColor: deepOrange[200],
+                boxShadow: 2,
+                cursor: "pointer",
+                "&:hover": {
+                  opacity: 0.8,
+                },
+                fontWeight: "medium",
+                color: "purple.700",
+                overflow: "hidden",
+              }}
+            >
+              {specialDayContent?.title}
+            </Box>
+          )}
+        </Box>
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          {visibleEvents.map((event) => (
+            <Box
+              key={event.id}
+              onClick={(e) => handleEventClick && handleEventClick(e, event)}
+              sx={{
+                borderRadius: 1,
+                px: 1,
+                cursor: "pointer",
+                opacity: 1,
+                backgroundColor: getEventBackgroundColorStyle(event.color),
+                "&:hover": { opacity: 0.8, ...getBackgroundColor(event.color) },
+                mb: 0,
+                zoom: 0.9,
+              }}
+            >
+              <Typography noWrap>{event.title}</Typography>
+              <Typography variant="caption" color="text.secondary">
+                {event.isFullDay
+                  ? "All day"
+                  : `${format(event.start, "HH:mm")} - ${format(
+                      event.end,
+                      "HH:mm"
+                    )}`}
+              </Typography>
+            </Box>
+          ))}
+          {remainingEvents > 0 && (
+            <Button
+              onClick={() => handleDayClick && handleDayClick(mappedDate)}
+              size="small"
+              sx={{
+                fontSize: "0.8rem",
+                color: "text.primary",
+                textTransform: "none",
+                minWidth: 0,
+                p: 0,
+                "&:hover": {
+                  color: "text.secondary",
+                  background: "none",
+                },
+                alignSelf: "flex-start",
+              }}
+            >
+              +{remainingEvents} more
+            </Button>
+          )}
+        </Box>
+
+        {isSpecialDay && specialDayContent && (
+          <SpecialDayModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            date={mappedDate}
+            content={specialDayContent}
+          />
+        )}
+      </Paper>
+    </Box>
   );
 }

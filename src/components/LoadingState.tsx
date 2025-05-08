@@ -5,7 +5,7 @@ interface LoadingStateProps {
 }
 
 const LoadingState: React.FC<LoadingStateProps> = ({
-  spinnerComponent = SpinnerVariant.SQUARE,
+  spinnerComponent = SpinnerVariant.CIRCLE,
 }) => {
   const Spinner = SPINNER_COMPONENTS[spinnerComponent];
   return <Spinner />;

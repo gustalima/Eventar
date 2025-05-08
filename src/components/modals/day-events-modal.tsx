@@ -1,9 +1,16 @@
+import CloseIcon from "@mui/icons-material/Close";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import IconButton from "@mui/material/IconButton";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 import { format } from "date-fns";
-import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
 import { Fragment, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { getEventBackgroundColorClass } from "@/utils/color-utils";
+import { getBackgroundColor } from "@/utils/color-utils";
 import type { CalendarEvent } from "@/types/calendar";
 import { EventViewModal } from "./event-view-modal";
 
@@ -25,82 +32,95 @@ export function DayEventsModal({
   );
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
 
+  console.log({ date, events });
+
   const sortedEvents = [...events].sort((a, b) => {
     if (a.isFullDay && !b.isFullDay) return -1;
     if (!a.isFullDay && b.isFullDay) return 1;
     return new Date(a.start).getTime() - new Date(b.start).getTime();
   });
 
-  const handleEventClick = (e: React.MouseEvent, event: CalendarEvent) => {
-    e.stopPropagation();
+  const filteredEvents = sortedEvents.filter((event) => {
+    const eventDate = new Date(event.start);
+
+    if (
+      date.getHours() === 0 &&
+      date.getMinutes() === 0 &&
+      date.getSeconds() === 0
+    ) {
+      return true;
+    }
+    return (
+      eventDate.getFullYear() === date.getFullYear() &&
+      eventDate.getMonth() === date.getMonth() &&
+      eventDate.getDate() === date.getDate() &&
+      eventDate.getHours() === date.getHours()
+    );
+  });
+
+  const handleEventClick = (event: CalendarEvent) => {
     setSelectedEvent(event);
     setIsEventModalOpen(true);
   };
 
-  if (!isOpen) return null;
-
   return (
     <Fragment>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            id="day-events-modal"
-            className="z-50 grid place-items-center fixed inset-0"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className="fixed inset-0 bg-black/50 z-50"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={onClose}
-            />
-            <motion.div
-              className="w-full max-w-md bg-white rounded-lg shadow-lg z-50 dark:bg-zinc-950"
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-            >
-              <div className="flex items-center justify-between p-4 border-b">
-                <h2 className="text-xl font-semibold">
-                  {format(date, "MMMM d, yyyy")}
-                </h2>
-                <Button variant="ghost" size="icon" onClick={onClose}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="p-4 max-h-[60vh] overflow-y-auto space-y-2">
-                {sortedEvents.map((event) => (
-                  <motion.div
-                    key={event.id}
-                    className={`rounded-lg p-3 ${getEventBackgroundColorClass(event.color)}`}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    onClick={(e) => handleEventClick(e, event)}
-                  >
-                    <h3 className="font-medium">{event.title}</h3>
-                    {event.isFullDay ? (
-                      <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                        All day
-                      </p>
-                    ) : (
-                      <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                        {format(new Date(event.start), "HH:mm")} -{" "}
-                        {format(new Date(event.end), "HH:mm")}
-                      </p>
-                    )}
-                    {event.description && (
-                      <p className="text-sm mt-1">{event.description}</p>
-                    )}
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
+        <DialogTitle
+          sx={{
+            m: 0,
+            p: 2,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography>{format(date, "MMMM d, yyyy")}</Typography>
+          <IconButton aria-label="close" onClick={onClose} size="small">
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers sx={{ maxHeight: "60vh" }}>
+          <Stack spacing={2}>
+            {filteredEvents.map((event) => (
+              <Paper
+                key={event.id}
+                elevation={2}
+                sx={{
+                  p: 2,
+                  cursor: "pointer",
+                  ...getBackgroundColor(event.color),
+                }}
+                onClick={() => handleEventClick(event)}
+              >
+                <Typography variant="subtitle1">
+                  {event.title} @ {event.resourceId}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {event.isFullDay
+                    ? "All day"
+                    : `${format(new Date(event.start), "HH:mm")} - ${format(new Date(event.end), "HH:mm")}`}
+                </Typography>
+                {event.description && (
+                  <Typography variant="body2" sx={{ mt: 1 }}>
+                    {event.description}
+                  </Typography>
+                )}
+              </Paper>
+            ))}
+            {filteredEvents.length === 0 && (
+              <Typography variant="body2" color="text.secondary">
+                No events for this hour.
+              </Typography>
+            )}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose} color="primary" disabled>
+            Add new
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {selectedEvent && (
         <EventViewModal

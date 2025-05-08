@@ -1,6 +1,8 @@
-import { motion } from "framer-motion";
+import Box from "@mui/material/Box";
+import CssBaseline from "@mui/material/CssBaseline";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Fragment, useMemo, useState } from "react";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useSessionStorage } from "@/hooks/useLocalStorage";
 import { getEventsForDate } from "@/utils/calendar-utils";
 import { filterEvents } from "@/utils/event-filters";
 import type {
@@ -15,7 +17,7 @@ import { CalendarHeader } from "./calendar-header";
 import { ErrorBoundary } from "./error-boundary";
 import { DayEventsModal } from "./modals/day-events-modal";
 import { EventViewModal } from "./modals/event-view-modal";
-import { renderView } from "./render-view";
+import { RenderView } from "./render-view";
 
 export function Eventar({
   events,
@@ -26,7 +28,7 @@ export function Eventar({
   showPastDates = true,
   isLoading,
   error,
-  spinnerComponent = SpinnerVariant.SQUARE,
+  spinnerComponent = SpinnerVariant.CIRCLE,
   theme = "light",
   customEventViewer,
   defaultModalConfig,
@@ -34,18 +36,24 @@ export function Eventar({
   showClock = false,
   resources = [],
   specialDays = [],
+  startOfWeek = "Mon",
 }: EventarProps) {
+  const darkTheme = createTheme({
+    palette: {
+      mode: theme,
+    },
+  });
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
     null
   );
   const [isDayModalOpen, setIsDayModalOpen] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
-  const [selectedColors, setSelectedColors] = useLocalStorage<string[]>(
+  const [selectedColors, setSelectedColors] = useSessionStorage<string[]>(
     "eventar-selected-colors",
     []
   );
-  const [selectedResource, setSelectedResource] = useLocalStorage<string>(
+  const [selectedResource, setSelectedResource] = useSessionStorage<string>(
     "eventar-selected-resource",
     "all"
   );
@@ -60,12 +68,12 @@ export function Eventar({
     ? [...yearRange].sort((a, b) => Number(a) - Number(b))
     : [currentYear];
 
-  const [view, setView] = useLocalStorage<CalendarView>(
+  const [view, setView] = useSessionStorage<CalendarView>(
     "eventar-current-view",
     defaultView
   );
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [agendaView, setAgendaView] = useLocalStorage<boolean>(
+  const [agendaView, setAgendaView] = useSessionStorage<boolean>(
     "eventar-agenda-view",
     false
   );
@@ -107,84 +115,85 @@ export function Eventar({
 
   return (
     <Fragment>
-      <div className={`${theme === "dark" ? "dark" : ""}`} id="eventar-wrapper">
-        <div
-          className="flex flex-col bg-white text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50"
-          id="calendar-layout"
-        >
-          <CalendarHeader
-            view={view}
-            setView={setView}
-            currentDate={currentDate}
-            setCurrentDate={setCurrentDate}
-            selectedColors={selectedColors}
-            onColorToggle={handleColorToggle}
-            navigation={navigation}
-            showViewOptions={views}
-            yearRange={validYearRange}
-            availableColors={availableColors}
-            showAgenda={showAgenda}
-            agendaView={agendaView}
-            handleAgendaView={() => setAgendaView(!agendaView)}
-            showClock={showClock}
-            resources={resources}
-            selectedResource={selectedResource}
-            onResourceChange={setSelectedResource}
-          />
-          <motion.main
-            id="calendar-view"
-            className="flex-1 p-4"
-            key={view}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+      <ThemeProvider theme={darkTheme}>
+        <CssBaseline />
+        <Box id="eventar-wrapper" sx={{ maxHeight: "100vh" }}>
+          <Box
+            id="calendar-layout"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+            }}
           >
-            <ErrorBoundary>
-              {renderView({
-                view,
-                currentDate,
-                filteredEvents,
-                showPastDates,
-                customEventViewer,
-                isLoading,
-                error,
-                spinnerComponent,
-                setSelectedDate,
-                setIsDayModalOpen,
-                setSelectedEvent,
-                setIsEventModalOpen,
-                agendaView,
-                specialDays,
-              })}
-            </ErrorBoundary>
-          </motion.main>
-        </div>
-      </div>
+            <CalendarHeader
+              view={view}
+              setView={setView}
+              currentDate={currentDate}
+              setCurrentDate={setCurrentDate}
+              selectedColors={selectedColors}
+              onColorToggle={handleColorToggle}
+              navigation={navigation}
+              showViewOptions={views}
+              yearRange={validYearRange}
+              availableColors={availableColors}
+              showAgenda={showAgenda}
+              agendaView={agendaView}
+              handleAgendaView={() => setAgendaView(!agendaView)}
+              showClock={showClock}
+              resources={resources}
+              selectedResource={selectedResource}
+              onResourceChange={setSelectedResource}
+            />
 
-      {selectedDate && (
-        <DayEventsModal
-          date={selectedDate}
-          events={getEventsForDate(selectedDate, events)}
-          isOpen={isDayModalOpen}
-          onClose={() => {
-            setIsDayModalOpen(false);
-            setSelectedDate(null);
-          }}
-        />
-      )}
+            <Box>
+              <ErrorBoundary>
+                <RenderView
+                  view={view}
+                  currentDate={currentDate}
+                  filteredEvents={filteredEvents}
+                  showPastDates={showPastDates}
+                  customEventViewer={customEventViewer}
+                  isLoading={isLoading}
+                  error={error}
+                  spinnerComponent={spinnerComponent}
+                  setSelectedDate={setSelectedDate}
+                  setIsDayModalOpen={setIsDayModalOpen}
+                  setSelectedEvent={setSelectedEvent}
+                  setIsEventModalOpen={setIsEventModalOpen}
+                  agendaView={agendaView}
+                  specialDays={specialDays}
+                  startOfWeek={startOfWeek}
+                />
+              </ErrorBoundary>
+            </Box>
+          </Box>
+        </Box>
 
-      {selectedEvent && (
-        <EventViewModal
-          event={selectedEvent}
-          isOpen={isEventModalOpen}
-          onClose={() => {
-            setIsEventModalOpen(false);
-            setSelectedEvent(null);
-          }}
-          customComponent={customEventViewer}
-          defaultModalConfig={defaultModalConfig}
-        />
-      )}
+        {selectedDate && (
+          <DayEventsModal
+            date={selectedDate}
+            events={getEventsForDate(selectedDate, events)}
+            isOpen={isDayModalOpen}
+            onClose={() => {
+              setIsDayModalOpen(false);
+              setSelectedDate(null);
+            }}
+          />
+        )}
+
+        {selectedEvent && (
+          <EventViewModal
+            event={selectedEvent}
+            isOpen={isEventModalOpen}
+            onClose={() => {
+              setIsEventModalOpen(false);
+              setSelectedEvent(null);
+            }}
+            customComponent={customEventViewer}
+            defaultModalConfig={defaultModalConfig}
+          />
+        )}
+      </ThemeProvider>
     </Fragment>
   );
 }

@@ -1,10 +1,22 @@
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import CloseIcon from "@mui/icons-material/Close";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import LinkIcon from "@mui/icons-material/Link";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
+import { grey } from "@mui/material/colors";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import IconButton from "@mui/material/IconButton";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 import { format } from "date-fns";
-import { AnimatePresence, motion } from "framer-motion";
-import { AlertCircle, Clock, LinkIcon, MapPin, X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { getEventColorClass } from "@/utils/color-utils";
+import { getBackgroundColor } from "@/utils/color-utils";
 import type { CalendarEvent, DefaultModalConfig } from "@/types/calendar";
 
 interface EventViewModalProps {
@@ -22,27 +34,12 @@ export function EventViewModal({
   customComponent,
   defaultModalConfig,
 }: EventViewModalProps) {
-  if (!isOpen) return null;
-
   const modalConfig = {
     showModalHeaderStrip: true,
     disableActionButton: false,
     actionButtonName: "Join Meeting",
     titleStyles: "text-xl font-bold",
     ...defaultModalConfig,
-  };
-
-  const getEventStatusColor = (status?: string) => {
-    switch (status) {
-      case "confirmed":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100";
-      case "tentative":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100";
-      case "cancelled":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100";
-      default:
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100";
-    }
   };
 
   const calculateDuration = (start: string, end: string) => {
@@ -61,178 +58,183 @@ export function EventViewModal({
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          id="event-view-modal"
-          className="z-50 grid place-items-center fixed inset-0"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <motion.div
-            className="fixed inset-0 bg-black/50 z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-          />
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      maxWidth="md"
+      fullWidth
+      slotProps={{
+        paper: {
+          sx: { borderRadius: 3, backgroundColor: "background.paper" },
+        },
+      }}
+    >
+      {!customComponent ? (
+        <>
+          <DialogTitle
+            sx={{
+              pb: 0.5,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "start",
+              ...(modalConfig.showModalHeaderStrip &&
+                getBackgroundColor(event.color)),
+            }}
+          >
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                {event.title} @ {event.resourceId}
+              </Typography>
+              <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                {event.status && <Chip label={event.status} size="small" />}
+                {event.isFullDay && (
+                  <Chip label="All Day" variant="outlined" size="small" />
+                )}
+              </Stack>
+            </Box>
+            <IconButton onClick={onClose} size="small">
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent dividers>
+            <Stack spacing={3}>
+              {/* Time and Date */}
+              <Stack direction="row" spacing={2} alignItems="center">
+                <IconButton
+                  disableRipple
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    backgroundColor: grey[200],
+                    color: grey[900],
+                    cursor: "default",
+                  }}
+                >
+                  <AccessTimeIcon />
+                </IconButton>
+                <Box>
+                  <Typography>
+                    {event.isFullDay ? (
+                      format(new Date(event.start), "EEEE, MMMM d, yyyy")
+                    ) : (
+                      <>
+                        {format(new Date(event.start), "EEEE, MMMM d, yyyy")}
+                        <br />
+                        {format(new Date(event.start), "HH:mm")} -{" "}
+                        {format(new Date(event.end), "HH:mm")}{" "}
+                        {event.duration ? (
+                          <Typography
+                            component="span"
+                            variant="caption"
+                            color="text.secondary"
+                          >
+                            ({getTimeFormatFromDuration(event.duration)})
+                          </Typography>
+                        ) : (
+                          <Typography
+                            component="span"
+                            variant="caption"
+                            color="text.secondary"
+                          >
+                            (
+                            {calculateDuration(
+                              event.start.toString(),
+                              event.end.toString()
+                            )}
+                            )
+                          </Typography>
+                        )}
+                      </>
+                    )}
+                  </Typography>
+                  {event.recurring && (
+                    <Typography variant="body2" color="text.secondary">
+                      Recurring event
+                    </Typography>
+                  )}
+                </Box>
+              </Stack>
 
-          {!customComponent && (
-            <motion.div
-              className="w-full max-w-2xl bg-white rounded-xl shadow-lg z-50 overflow-hidden dark:bg-zinc-950"
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-            >
-              {/* Header with color strip */}
-              {modalConfig.showModalHeaderStrip && (
-                <div
-                  className={`h-2 w-full ${getEventColorClass(event.color)}`}
-                />
+              {/* Location if available */}
+              {event.location && (
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Box
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: "50%",
+                      backgroundColor: "action.hover",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <LocationOnIcon />
+                  </Box>
+                  <Box>
+                    <Typography>{event.location}</Typography>
+                    {event.locationDetail && (
+                      <Typography variant="body2" color="text.secondary">
+                        {event.locationDetail}
+                      </Typography>
+                    )}
+                  </Box>
+                </Stack>
               )}
 
-              {/* Main content */}
-              <div className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <h2 className={modalConfig.titleStyles}>{event.title}</h2>
-                    <div className="flex items-center gap-2">
-                      {event.status && (
-                        <Badge
-                          variant="outline"
-                          className={getEventStatusColor(event.status)}
-                        >
-                          {event?.status}
-                        </Badge>
-                      )}
-                      {event.isFullDay && (
-                        <Badge variant="outline">All Day</Badge>
-                      )}
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={onClose}
-                    className="rounded-full"
+              {/* Description */}
+              {event.description && (
+                <Box>
+                  <Typography>Description</Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ whiteSpace: "pre-wrap" }}
                   >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
+                    {event.description}
+                  </Typography>
+                </Box>
+              )}
 
-                <Separator className="my-4" />
-
-                <div className="grid gap-4">
-                  {/* Time and Date */}
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-zinc-900/10 flex items-center justify-center dark:bg-zinc-50/10">
-                      <Clock className="h-5 w-5 text-zinc-900 dark:text-zinc-50" />
-                    </div>
-                    <div>
-                      <p className="font-medium">
-                        {event.isFullDay ? (
-                          format(new Date(event.start), "EEEE, MMMM d, yyyy")
-                        ) : (
-                          <>
-                            {format(
-                              new Date(event.start),
-                              "EEEE, MMMM d, yyyy"
-                            )}
-                            <br />
-                            {format(new Date(event.start), "HH:mm")} -{" "}
-                            {format(new Date(event.end), "HH:mm")}{" "}
-                            {event.duration ? (
-                              <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                                ({getTimeFormatFromDuration(event.duration)})
-                              </span>
-                            ) : (
-                              <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                                (
-                                {calculateDuration(
-                                  event.start.toString(),
-                                  event.end.toString()
-                                )}
-                                )
-                              </span>
-                            )}
-                          </>
-                        )}
-                      </p>
-                      {event.recurring && (
-                        <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                          Recurring event
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Location if available */}
-                  {event.location && (
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-zinc-900/10 flex items-center justify-center dark:bg-zinc-50/10">
-                        <MapPin className="h-5 w-5 text-zinc-900 dark:text-zinc-50" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{event.location}</p>
-                        <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                          {event.locationDetail}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Description */}
-                  {event.description && (
-                    <div className="mt-4 space-y-2">
-                      <h3 className="font-medium">Description</h3>
-                      <p className="text-sm text-zinc-500 whitespace-pre-wrap dark:text-zinc-400">
-                        {event.description}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Additional Info */}
-                  {event.additionalInfo && (
-                    <div className="mt-4 p-4 rounded-lg bg-zinc-100 dark:bg-zinc-800">
-                      <div className="flex items-center gap-2 text-sm">
-                        <AlertCircle className="h-4 w-4" />
-                        <p>{event.additionalInfo}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Action Buttons */}
-                <div className="mt-6 flex items-center gap-2">
-                  {event.meetingLink && (
-                    <Button
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() => window.open(event.meetingLink, "_blank")}
-                      disabled={modalConfig.disableActionButton}
-                    >
-                      <LinkIcon className="mr-2 h-4 w-4" />
-                      {modalConfig.actionButtonName}
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {customComponent && (
-            <motion.div
-              className="w-full max-w-2xl bg-white rounded-xl shadow-lg z-50 overflow-hidden dark:bg-zinc-950"
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-            >
-              {customComponent(event)}
-            </motion.div>
-          )}
-        </motion.div>
+              {/* Additional Info */}
+              {event.additionalInfo && (
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 2,
+                    backgroundColor: "action.selected",
+                    borderRadius: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
+                >
+                  <ErrorOutlineIcon />
+                  <Typography variant="body2">
+                    {event.additionalInfo}
+                  </Typography>
+                </Paper>
+              )}
+            </Stack>
+          </DialogContent>
+          <DialogActions>
+            {event.meetingLink && (
+              <Button
+                variant="outlined"
+                startIcon={<LinkIcon />}
+                fullWidth
+                onClick={() => window.open(event.meetingLink, "_blank")}
+                disabled={modalConfig.disableActionButton}
+              >
+                {modalConfig.actionButtonName}
+              </Button>
+            )}
+          </DialogActions>
+        </>
+      ) : (
+        <Box>{customComponent(event)}</Box>
       )}
-    </AnimatePresence>
+    </Dialog>
   );
 }

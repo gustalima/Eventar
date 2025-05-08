@@ -1,21 +1,31 @@
-export function WeekDaysHeader({ date }: { date: Date }) {
+import { Typography } from "@mui/material";
+
+export function WeekDaysHeader({
+  startOfWeek,
+}: {
+  startOfWeek: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
+}) {
   const getWeekDays = () => {
-    // Get first day of the month
-    const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-    const weekDays = Array.from({ length: 7 }).map((_, i) => {
-      const day = new Date(firstDayOfMonth);
-      day.setDate(1 + i);
-      return day.toLocaleDateString("en-US", { weekday: "short" });
-    });
-    return weekDays;
+    const allDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const startIdx = allDays.indexOf(startOfWeek);
+    return [...allDays.slice(startIdx), ...allDays.slice(0, startIdx)];
   };
 
   return (
     <>
       {getWeekDays().map((day) => (
-        <div key={day} className="p-4 text-center font-medium border-b">
+        <Typography
+          key={day}
+          sx={{
+            p: 2,
+            textAlign: "center",
+            fontWeight: 600,
+            borderBottom: "1px solid",
+            borderColor: "divider",
+          }}
+        >
           {day}
-        </div>
+        </Typography>
       ))}
     </>
   );

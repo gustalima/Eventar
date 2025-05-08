@@ -1,6 +1,8 @@
 import { MonthGrid } from "@/views/year-view/month-grid";
-import { motion } from "framer-motion";
-import { memo, Suspense } from "react";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import { memo } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { YearViewProps } from "@/types/year";
 import { MONTHS } from "@/constants/calendar";
@@ -12,26 +14,54 @@ export const YearView = memo(function YearView({
   handleEventClick,
   isLoading,
   specialDays,
+  startOfWeek,
 }: YearViewProps) {
   if (isLoading) {
-    return <div className="animate-pulse">Loading calendar...</div>;
+    return (
+      <Box
+        sx={{
+          p: 2,
+          textAlign: "center",
+          color: "text.secondary",
+          opacity: 0.7,
+        }}
+      >
+        Loading calendar...
+      </Box>
+    );
   }
 
   return (
-    <div
-      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+    <Box
       id="year-view"
+      sx={{
+        display: "grid",
+        gridTemplateColumns: {
+          xs: "1fr",
+          md: "1fr 1fr",
+          lg: "1fr 1fr 1fr",
+          xl: "1fr 1fr 1fr 1fr",
+        },
+        gap: 2,
+      }}
     >
       {MONTHS.map((month, index) => (
-        <ErrorBoundary key={month} fallback={<div>Error loading month</div>}>
-          <Suspense fallback={<div>Loading month...</div>}>
-            <motion.div
-              className="border rounded-lg p-4"
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: index * 0.1 }}
+        <ErrorBoundary key={month} fallback={<Box>Error loading month</Box>}>
+          <Box sx={{ height: "100%" }}>
+            <Paper
+              elevation={0}
+              sx={{
+                border: 1,
+                borderColor: "divider",
+                borderRadius: 2,
+                p: 1.5,
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                zoom: 0.95,
+              }}
             >
-              <h3 className="font-semibold mb-2">{month}</h3>
+              <Typography sx={{ fontWeight: 600, mb: 1 }}>{month}</Typography>
               <MonthGrid
                 month={month}
                 monthIndex={index}
@@ -40,11 +70,12 @@ export const YearView = memo(function YearView({
                 showPastDates={showPastDates}
                 handleEventClick={handleEventClick}
                 specialDays={specialDays}
+                startOfWeek={startOfWeek}
               />
-            </motion.div>
-          </Suspense>
+            </Paper>
+          </Box>
         </ErrorBoundary>
       ))}
-    </div>
+    </Box>
   );
 });

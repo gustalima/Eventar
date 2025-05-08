@@ -1,15 +1,30 @@
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import CheckIcon from "@mui/icons-material/Check";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import LinkIcon from "@mui/icons-material/Link";
+import PlaceIcon from "@mui/icons-material/Place";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  IconButton,
+  Paper,
+  Stack,
+  Tab,
+  Tabs,
+  Typography,
+} from "@mui/material";
 import { format } from "date-fns";
-import { motion } from "framer-motion";
-import { Check, Clock, Copy, Info, LinkIcon, MapPin } from "lucide-react";
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getBackgroundColor } from "@/utils/color-utils";
 import { CalendarEvent } from "@/types/calendar";
 
 export default function CardEventModal({ event }: { event: CalendarEvent }) {
   const [copied, setCopied] = useState(false);
+  const [tab, setTab] = useState(0);
 
   const handleCopyLink = async () => {
     if (event.meetingLink) {
@@ -25,129 +40,183 @@ export default function CardEventModal({ event }: { event: CalendarEvent }) {
     return `${hours}h ${minutes}m`;
   };
 
-  const colorClasses = {
-    blue: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-100",
-    green: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-100",
-    yellow:
-      "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-100",
-    purple:
-      "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-100",
-    red: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-100",
-  };
-
   return (
-    <motion.div
-      initial={{ y: 20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      exit={{ y: 20, opacity: 0 }}
-      className="w-full max-w-2xl"
+    <Box
+      sx={{
+        width: "100%",
+        maxWidth: 700,
+        mx: "auto",
+        my: 4,
+        animation: "fadeInUp 0.3s",
+        "@keyframes fadeInUp": {
+          from: { opacity: 0, transform: "translateY(20px)" },
+          to: { opacity: 1, transform: "translateY(0)" },
+        },
+      }}
     >
-      <Card className="border-none shadow-2xl">
-        <CardContent className="p-0">
-          <div className="relative">
-            <div className={`p-6 ${colorClasses[event.color ?? "blue"]}`}>
-              <div className="flex justify-between items-start">
-                <h2 className="text-2xl font-bold">{event.title}</h2>
-              </div>
-              <div className="flex gap-2 mt-2">
+      <Card elevation={8}>
+        <CardContent sx={{ p: 0, ...getBackgroundColor(event.color, 0.7) }}>
+          <Box sx={{ position: "relative" }}>
+            <Box sx={{ p: 3 }}>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="flex-start"
+              >
+                <Typography variant="h5" fontWeight="bold">
+                  {event.title}
+                </Typography>
+              </Stack>
+              <Stack direction="row" spacing={1} mt={1}>
                 {event.course && (
-                  <Badge variant="outline">{event.course}</Badge>
+                  <Chip label={event.course} variant="outlined" />
                 )}
-                {event.batch && <Badge variant="outline">{event.batch}</Badge>}
-              </div>
-            </div>
+                {event.batch && <Chip label={event.batch} variant="outlined" />}
+              </Stack>
+            </Box>
 
-            <Tabs defaultValue="details" className="p-6">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="details">Details</TabsTrigger>
-                <TabsTrigger value="info">Additional Info</TabsTrigger>
-              </TabsList>
+            <Box sx={{ px: 3 }}>
+              <Tabs
+                value={tab}
+                onChange={(_, v) => setTab(v)}
+                sx={{ mb: 3, borderBottom: 1, borderColor: "divider" }}
+                variant="fullWidth"
+              >
+                <Tab label="Details" />
+                <Tab label="Additional Info" />
+              </Tabs>
 
-              <TabsContent value="details" className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <Clock className="h-5 w-5 text-zinc-500" />
-                  <div>
-                    <p className="font-medium">
-                      {format(new Date(event.start), "EEEE, MMMM d, yyyy")}
-                    </p>
-                    {!event.isFullDay && (
-                      <p className="text-sm text-zinc-500">
-                        {format(new Date(event.start), "HH:mm")} -
-                        {format(new Date(event.end), "HH:mm")}
-                        <span className="ml-2">
-                          (
-                          {event.duration
-                            ? getTimeFormatFromDuration(event.duration)
-                            : getTimeFormatFromDuration(
-                                (new Date(event.end).getTime() -
-                                  new Date(event.start).getTime()) /
-                                  3600000
-                              )}
-                          )
-                        </span>
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {event.location && (
-                  <div className="flex items-center gap-4">
-                    <MapPin className="h-5 w-5 text-zinc-500" />
-                    <div>
-                      <p className="font-medium">{event.location}</p>
-                      {event.locationDetail && (
-                        <p className="text-sm text-zinc-500">
-                          {event.locationDetail}
-                        </p>
+              {tab === 0 && (
+                <Box>
+                  <Stack direction="row" alignItems="center" spacing={2} mb={2}>
+                    <AccessTimeIcon sx={{ color: "#71717a", fontSize: 20 }} />
+                    <Box>
+                      <Typography fontWeight={500}>
+                        {format(new Date(event.start), "EEEE, MMMM d, yyyy")}
+                      </Typography>
+                      {!event.isFullDay && (
+                        <Typography variant="body2" color="text.secondary">
+                          {format(new Date(event.start), "HH:mm")} -{" "}
+                          {format(new Date(event.end), "HH:mm")}
+                          <span style={{ marginLeft: 8 }}>
+                            (
+                            {event.duration
+                              ? getTimeFormatFromDuration(event.duration)
+                              : getTimeFormatFromDuration(
+                                  (new Date(event.end).getTime() -
+                                    new Date(event.start).getTime()) /
+                                    3600000
+                                )}
+                            )
+                          </span>
+                        </Typography>
                       )}
-                    </div>
-                  </div>
-                )}
+                    </Box>
+                  </Stack>
 
-                {event.description && (
-                  <div className="bg-zinc-50 dark:bg-zinc-900 p-4 rounded-lg">
-                    <p className="text-sm whitespace-pre-wrap">
-                      {event.description}
-                    </p>
-                  </div>
-                )}
-              </TabsContent>
+                  {event.location && (
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      spacing={2}
+                      mb={2}
+                    >
+                      <PlaceIcon sx={{ color: "#71717a", fontSize: 20 }} />
+                      <Box>
+                        <Typography fontWeight={500}>
+                          {event.location}
+                        </Typography>
+                        {event.locationDetail && (
+                          <Typography variant="body2" color="text.secondary">
+                            {event.locationDetail}
+                          </Typography>
+                        )}
+                      </Box>
+                    </Stack>
+                  )}
 
-              <TabsContent value="info">
-                {event.additionalInfo ? (
-                  <div className="bg-zinc-50 dark:bg-zinc-900 p-4 rounded-lg">
-                    <p className="text-sm">{event.additionalInfo}</p>
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-zinc-500">
-                    <Info className="h-12 w-12 mx-auto mb-2" />
-                    <p>No additional information available</p>
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
+                  {event.description && (
+                    <Paper
+                      variant="outlined"
+                      sx={{
+                        backgroundColor: (theme) =>
+                          theme.palette.mode === "dark"
+                            ? "grey.900"
+                            : "grey.50",
+                        p: 2,
+                        borderRadius: 2,
+                        mt: 2,
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{ whiteSpace: "pre-wrap" }}
+                      >
+                        {event.description}
+                      </Typography>
+                    </Paper>
+                  )}
+                </Box>
+              )}
+
+              {tab === 1 && (
+                <Box>
+                  {event.additionalInfo ? (
+                    <Paper
+                      variant="outlined"
+                      sx={{
+                        backgroundColor: (theme) =>
+                          theme.palette.mode === "dark"
+                            ? "grey.900"
+                            : "grey.50",
+                        p: 2,
+                        borderRadius: 2,
+                      }}
+                    >
+                      <Typography variant="body2">
+                        {event.additionalInfo}
+                      </Typography>
+                    </Paper>
+                  ) : (
+                    <Box
+                      sx={{
+                        textAlign: "center",
+                        py: 6,
+                        color: "text.secondary",
+                      }}
+                    >
+                      <InfoOutlinedIcon sx={{ fontSize: 48, mb: 1 }} />
+                      <Typography>
+                        No additional information available
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+              )}
+            </Box>
 
             {event.meetingLink && (
-              <div className="p-6 pt-0 flex gap-3">
+              <Box sx={{ p: 3, pt: 0, display: "flex", gap: 2 }}>
                 <Button
-                  className="flex-1"
+                  fullWidth
+                  variant="contained"
+                  startIcon={<LinkIcon sx={{ fontSize: 20 }} />}
                   onClick={() => window.open(event.meetingLink, "_blank")}
                 >
-                  <LinkIcon className="mr-2 h-4 w-4" />
                   Join Meeting
                 </Button>
-                <Button variant="outline" onClick={handleCopyLink}>
+                <IconButton color="primary" onClick={handleCopyLink}>
                   {copied ? (
-                    <Check className="h-4 w-4" />
+                    <CheckIcon sx={{ fontSize: 20 }} />
                   ) : (
-                    <Copy className="h-4 w-4" />
+                    <ContentCopyIcon sx={{ fontSize: 20 }} />
                   )}
-                </Button>
-              </div>
+                </IconButton>
+              </Box>
             )}
-          </div>
+          </Box>
         </CardContent>
       </Card>
-    </motion.div>
+    </Box>
   );
 }

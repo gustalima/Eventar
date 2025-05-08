@@ -1,6 +1,9 @@
+import Box from "@mui/material/Box";
+import { grey } from "@mui/material/colors";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
 import { format, isBefore, setHours } from "date-fns";
-import { motion } from "framer-motion";
-import { getEventBackgroundColorClass } from "@/utils/color-utils";
+import { getBackgroundColor } from "@/utils/color-utils";
 import { CalendarEvent } from "@/types/calendar";
 import { HourlyEventsProps } from "@/types/day";
 
@@ -16,6 +19,7 @@ const HourlyEvents = ({
     if (showPastDates) return false;
     const currentDate = new Date();
     const hourDate = setHours(date, hour);
+
     return isBefore(hourDate, currentDate);
   };
 
@@ -30,7 +34,15 @@ const HourlyEvents = ({
   };
 
   return (
-    <div className="flex-1 rounded-lg border">
+    <Box
+      sx={{
+        flex: 1,
+        borderRadius: 2,
+        border: 1,
+        borderColor: "divider",
+        overflow: "hidden",
+      }}
+    >
       {hours.map((hour) => {
         const timeEvents = dayEvents.filter(
           (event) =>
@@ -38,28 +50,42 @@ const HourlyEvents = ({
         );
 
         return (
-          <div key={hour} className="relative group min-h-[60px]">
-            <div
-              className={`sticky left-0 w-20 pr-4 text-sm text-right py-4 ${
-                isPastHour(hour)
-                  ? "text-zinc-400 dark:text-zinc-600"
-                  : "text-zinc-500 dark:text-zinc-400"
-              }`}
+          <Box
+            key={hour}
+            sx={{
+              position: "relative",
+              minHeight: 60,
+              backgroundColor: isPastHour(hour) ? grey[100] : "white",
+              "&:hover": {
+                backgroundColor: isPastHour(hour) ? grey[200] : grey[100],
+              },
+              borderBottom: 1,
+              borderColor: "divider",
+              "&:last-child": {
+                borderBottom: "none",
+              },
+            }}
+            onDoubleClick={(e) => {
+              e.stopPropagation();
+              handleDayClick?.(setHours(date, hour));
+            }}
+          >
+            <Box
+              sx={{
+                position: "sticky",
+                left: 0,
+                width: 80,
+                pr: 2,
+                py: 2,
+                textAlign: "right",
+                fontSize: 14,
+                color: isPastHour(hour) ? "text.disabled" : "text.secondary",
+                zIndex: 1,
+              }}
             >
               {hour.toString().padStart(2, "0")}:00
-            </div>
-            <div
-              className={`absolute left-0 right-0 -top-px h-px ${
-                isPastHour(hour)
-                  ? "bg-zinc-100 dark:bg-zinc-800"
-                  : "bg-zinc-200 group-hover:bg-zinc-100 dark:bg-zinc-800 dark:group-hover:bg-zinc-800"
-              }`}
-            />
-            <div
-              className={`absolute inset-0 ${
-                isPastHour(hour) ? "bg-zinc-50/50 dark:bg-zinc-900/50" : ""
-              }`}
-            />
+            </Box>
+
             {Object.entries(groupEventsByTime(timeEvents)).map(
               ([timeKey, events]) => {
                 const firstEvent = events[0];
@@ -71,65 +97,94 @@ const HourlyEvents = ({
                   (1000 * 60 * 60);
 
                 return (
-                  <motion.div
+                  <Box
                     key={timeKey}
-                    className={`absolute left-24 right-4 rounded cursor-pointer
-                      ${
-                        isPastHour(hour)
-                          ? "grayscale brightness-95 opacity-50"
-                          : ""
-                      }`}
-                    style={{
+                    sx={{
+                      position: "absolute",
+                      left: 96,
+                      right: 16,
+                      borderRadius: 2,
+                      cursor: "pointer",
                       top: `${(eventStart.getMinutes() / 60) * 100}%`,
                       height: `${Math.max(durationInHours * 100, 8)}%`,
-                      minHeight: "24px",
+                      minHeight: 24,
+                      zIndex: 2,
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
                       if (hasMultiple && !isPastHour(hour)) {
                         handleDayClick?.(setHours(date, hour));
                       } else if (!isPastHour(hour)) {
-                        handleEventClick?.(e, firstEvent);
+                        handleDayClick?.(setHours(date, hour));
                       } else {
                         return;
                       }
                     }}
                   >
                     {hasMultiple ? (
-                      <div className="relative bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 p-2 rounded shadow-sm h-full">
-                        <div className="absolute -right-1 -top-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                          {events.length}
-                        </div>
-                        <h4 className="font-medium">Multiple Events</h4>
-                        <p className="text-sm">
-                          {format(new Date(firstEvent.start), "HH:mm")} -{" "}
-                          {format(new Date(firstEvent.end), "HH:mm")}
-                        </p>
-                      </div>
+                      <ConcurrentHourlyEvents events={events} />
                     ) : (
-                      <div
-                        className={`${getEventBackgroundColorClass(
-                          firstEvent.color
-                        )} p-2 rounded h-full`}
+                      <Paper
+                        elevation={1}
+                        sx={{
+                          p: 2,
+                          pt: 0.75,
+                          borderRadius: 2,
+                          height: "100%",
+                          ...getBackgroundColor(firstEvent.color),
+                          overflow: "hidden",
+                        }}
                       >
-                        <h4 className="font-medium truncate">
+                        <Typography variant="subtitle1" noWrap>
                           {firstEvent.title}
-                        </h4>
-                        <p className="text-sm">
+                        </Typography>
+                        <Typography variant="body2">
                           {format(eventStart, "HH:mm")} -{" "}
                           {format(eventEnd, "HH:mm")}
-                        </p>
-                      </div>
+                        </Typography>
+                      </Paper>
                     )}
-                  </motion.div>
+                  </Box>
                 );
               }
             )}
-          </div>
+          </Box>
         );
       })}
-    </div>
+    </Box>
   );
 };
 
 export default HourlyEvents;
+type ConcurrentHourlyEventsProps = {
+  events: CalendarEvent[];
+};
+
+function ConcurrentHourlyEvents({ events }: ConcurrentHourlyEventsProps) {
+  return (
+    <Box sx={{ display: "flex", flexDirection: "row", flex: 1, gap: 0.5 }}>
+      {events.map((event) => (
+        <Paper
+          key={event.id}
+          elevation={1}
+          sx={{
+            flex: 1,
+            position: "relative",
+            ...getBackgroundColor(event.color),
+            p: 2,
+            pt: 0.75,
+            borderRadius: 2,
+            height: "100%",
+            boxShadow: 1,
+          }}
+        >
+          <Typography variant="subtitle1">{event.title}</Typography>
+          <Typography variant="body2">
+            {format(new Date(event.start), "HH:mm")} -{" "}
+            {format(new Date(event.end), "HH:mm")}
+          </Typography>
+        </Paper>
+      ))}
+    </Box>
+  );
+}

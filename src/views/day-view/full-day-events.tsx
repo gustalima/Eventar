@@ -1,5 +1,7 @@
-import { motion } from "framer-motion";
-import { getEventBackgroundColorClass } from "@/utils/color-utils";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import { getBackgroundColor } from "@/utils/color-utils";
 import { isPastDate } from "@/utils/date-utils";
 import { FullDayEventsDayViewProps } from "@/types/day";
 
@@ -10,60 +12,116 @@ const FullDayEvents = ({
   showAllFullDayEvents,
   setShowAllFullDayEvents,
 }: FullDayEventsDayViewProps) => (
-  <div className="rounded-lg border">
-    <div className="border-b px-4 py-2">
-      <h3 className="font-medium">Full-Day Events ({fullDayEvents.length})</h3>
-    </div>
-    <div className="max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-600 scrollbar-track-transparent">
-      {visibleFullDayEvents.map((event, index) => {
+  <Box
+    sx={{
+      borderRadius: 2,
+      border: 1,
+      borderColor: "divider",
+      bgcolor: "background.paper",
+    }}
+  >
+    <Box
+      sx={{
+        borderBottom: 1,
+        borderColor: "divider",
+        px: 2,
+        py: 1,
+      }}
+    >
+      <Typography variant="h6" fontWeight={500}>
+        Full-Day Events ({fullDayEvents.length})
+      </Typography>
+    </Box>
+    <Box
+      sx={{
+        maxHeight: 300,
+        overflowY: "auto",
+        position: "relative",
+        borderBottomRightRadius: 8,
+        borderBottomLeftRadius: 8,
+      }}
+    >
+      {visibleFullDayEvents.map((event) => {
         const eventStartDate = new Date(event.start);
         const pastDate = isPastDate(eventStartDate);
         return (
-          <motion.div
+          <Box
             key={event.id}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: index * 0.1 }}
-            className={`p-4 cursor-pointer hover:opacity-80 ${getEventBackgroundColorClass(
-              event.color
-            )}  ${
-              pastDate
-                ? "opacity-50 cursor-not-allowed line-through grayscale"
-                : "cursor-pointer"
-            }`}
+            sx={{
+              py: 1,
+              px: 2,
+              cursor: pastDate ? "not-allowed" : "pointer",
+              opacity: pastDate ? 0.5 : 1,
+              textDecoration: pastDate ? "line-through" : "none",
+              filter: pastDate ? "grayscale(1)" : "none",
+              transition: "opacity 0.2s",
+              "&:hover": {
+                opacity: 0.8,
+              },
+              ...getBackgroundColor(event.color),
+            }}
             onClick={(e) => {
               if (!pastDate) {
                 handleEventClick?.(e, event);
               }
             }}
           >
-            <div className="flex justify-between items-start">
-              <div>
-                <h4 className="font-medium">{event.title}</h4>
-                <p className="text-sm">{event.description}</p>
-              </div>
-              <span className="text-sm">All Day</span>
-            </div>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+              }}
+            >
+              <Box>
+                <Typography variant="subtitle1" fontWeight={500}>
+                  {event.title}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {event.description}
+                </Typography>
+              </Box>
+              <Typography variant="body2">All Day</Typography>
+            </Box>
             {pastDate && (
-              <p className="text-xs text-red-500">This event has passed</p>
+              <Typography variant="caption" color="error">
+                This event has passed
+              </Typography>
             )}
-          </motion.div>
+          </Box>
         );
       })}
       {fullDayEvents.length > 3 && (
-        <div className="p-4 border-t sticky bottom-0 bg-white dark:bg-zinc-900">
-          <button
+        <Box
+          sx={{
+            p: 2,
+            borderTop: 1,
+            borderColor: "divider",
+            position: "sticky",
+            bottom: 0,
+            bgcolor: "background.paper",
+            zIndex: 1,
+          }}
+        >
+          <Button
             onClick={() => setShowAllFullDayEvents(!showAllFullDayEvents)}
-            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+            sx={{
+              textTransform: "none",
+              "&:hover": {
+                color: "primary.dark",
+                bgcolor: "transparent",
+              },
+            }}
+            size="small"
           >
             {showAllFullDayEvents
               ? "Show Less"
               : `Show ${fullDayEvents.length - 3} More`}
-          </button>
-        </div>
+          </Button>
+        </Box>
       )}
-    </div>
-  </div>
+    </Box>
+  </Box>
 );
 
 export default FullDayEvents;

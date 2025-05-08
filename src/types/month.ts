@@ -10,6 +10,7 @@ export interface MonthViewProps {
   handleEventClick?: (e: React.MouseEvent, event: CalendarEvent) => void;
   handleDayClick?: (date: Date) => void;
   specialDays?: SpecialDay[];
+  startOfWeek: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
 }
 
 export interface MonthGridProps {
@@ -20,4 +21,5 @@ export interface MonthGridProps {
   showPastDates: boolean;
   handleEventClick?: (e: React.MouseEvent, event: CalendarEvent) => void;
   specialDays?: SpecialDay[];
+  startOfWeek: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
 }

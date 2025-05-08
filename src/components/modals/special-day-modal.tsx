@@ -1,6 +1,16 @@
+import CloseIcon from "@mui/icons-material/Close";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
+import { deepOrange } from "@mui/material/colors";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import IconButton from "@mui/material/IconButton";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 import { format } from "date-fns";
-import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
 import { SpecialDay } from "@/types/calendar";
 
 interface SpecialDayModalProps {
@@ -17,67 +27,90 @@ export const SpecialDayModal = ({
   content,
 }: SpecialDayModalProps) => {
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.5 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black z-40"
-            onClick={onClose}
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      slotProps={{
+        paper: {
+          sx: { borderRadius: 1, backgroundColor: "background.paper" },
+        },
+      }}
+    >
+      <DialogTitle sx={{ p: 2 }}>
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <Box
+            sx={{
+              width: 12,
+              height: 12,
+              borderRadius: "50%",
+              background: deepOrange[500],
+            }}
           />
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0, y: "-50%" }}
-            animate={{ scale: 1, opacity: 1, y: "-50%" }}
-            exit={{ scale: 0.9, opacity: 0, y: "-50%" }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg z-50 px-4 md:px-0"
+          <Typography variant="body2" color="text.secondary">
+            {format(date, "MMMM d, yyyy")}
+          </Typography>
+          <Box flex={1} />
+          <IconButton onClick={onClose} size="small">
+            <CloseIcon sx={{ width: 20, height: 20 }} />
+          </IconButton>
+        </Stack>
+      </DialogTitle>
+      <DialogContent sx={{ pt: 1, pb: 0 }}>
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          mb={2}
+        >
+          <Typography
+            variant="h5"
+            fontWeight="bold"
+            sx={{
+              background: deepOrange[500],
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
           >
-            <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl overflow-hidden">
-              <div className="relative p-6">
-                <button
-                  onClick={onClose}
-                  className="absolute right-4 top-4 p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-700"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+            {content.title}
+          </Typography>
+          <Chip
+            label={content.type}
+            sx={{
+              backgroundColor: "purple.100",
 
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-500" />
-                    <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                      {format(date, "MMMM d, yyyy")}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                      {content.title}
-                    </h2>
-
-                    <div className="inline-block px-3 py-1 rounded text-sm bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
-                      {content.type}
-                    </div>
-                  </div>
-
-                  <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed text-lg">
-                    {content.description}
-                  </p>
-
-                  <div className="pt-4">
-                    <button
-                      onClick={onClose}
-                      className="w-full py-3 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium hover:opacity-90 transition-opacity"
-                    >
-                      Close
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+              background: (theme) =>
+                theme.palette.mode === "dark"
+                  ? deepOrange[300]
+                  : deepOrange[500],
+              color: (theme) =>
+                theme.palette.mode === "dark" ? "black" : "white",
+            }}
+            size="small"
+          />
+        </Stack>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+          {content.description}
+        </Typography>
+      </DialogContent>
+      <DialogActions sx={{ px: 3, pb: 3, pt: 0 }}>
+        <Button
+          onClick={onClose}
+          fullWidth
+          variant="contained"
+          sx={{
+            background: deepOrange[500],
+            py: 1.5,
+            borderRadius: 1,
+            "&:hover": {
+              opacity: 0.9,
+            },
+          }}
+        >
+          Close
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };

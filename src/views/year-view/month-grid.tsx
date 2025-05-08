@@ -1,12 +1,17 @@
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import { memo } from "react";
 import { getMonthDays, isSpecialDay } from "@/utils/date-utils";
 import { MonthGridProps } from "@/types/month";
 import { WEEKDAYS } from "@/constants/calendar";
 import { DayCell } from "./day-cell";
 
-const getAlignedWeekdays = (year: number, monthIndex: number) => {
-  const firstDay = new Date(year, monthIndex, 1).getDay();
-  return [...WEEKDAYS.slice(firstDay), ...WEEKDAYS.slice(0, firstDay)];
+const getAlignedWeekdays = (
+  startOfWeek: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun"
+) => {
+  const startIndex = WEEKDAYS.indexOf(startOfWeek.slice(0, 2));
+  if (startIndex === -1) return WEEKDAYS;
+  return [...WEEKDAYS.slice(startIndex), ...WEEKDAYS.slice(0, startIndex)];
 };
 
 export const MonthGrid = memo(function MonthGrid({
@@ -17,25 +22,35 @@ export const MonthGrid = memo(function MonthGrid({
   showPastDates,
   handleEventClick,
   specialDays,
+  startOfWeek,
 }: MonthGridProps) {
   const days = getMonthDays(year, monthIndex);
-  const alignedWeekdays = getAlignedWeekdays(year, monthIndex);
+  const alignedWeekdays = getAlignedWeekdays(startOfWeek);
 
   return (
-    <div className="grid grid-cols-7 gap-1 text-sm">
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: "repeat(7, 1fr)",
+        gap: 1,
+        fontSize: "0.75rem",
+      }}
+    >
       {alignedWeekdays.map((day) => (
-        <div
+        <Typography
           key={day}
-          className="text-center text-zinc-500 dark:text-zinc-400"
+          align="center"
+          color="text.secondary"
           aria-label={day}
         >
           {day}
-        </div>
+        </Typography>
       ))}
       {days.map((date, i) => (
         <DayCell
           key={`${month}-${i}`}
           date={date}
+          month={month}
           events={events}
           showPastDates={showPastDates}
           handleEventClick={handleEventClick}
@@ -45,6 +60,6 @@ export const MonthGrid = memo(function MonthGrid({
           )}
         />
       ))}
-    </div>
+    </Box>
   );
 });

@@ -1,5 +1,9 @@
 import FullDayEvents from "@/views/day-view/full-day-events";
 import HourlyEvents from "@/views/day-view/hourly-events";
+import Box from "@mui/material/Box";
+import { deepOrange } from "@mui/material/colors";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
 import { format } from "date-fns";
 import { useState } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
@@ -42,22 +46,57 @@ export function DayView({
 
   return (
     <ErrorBoundary>
-      <div className="flex flex-col space-y-4" id="day-view">
-        <div className="flex items-center gap-2">
-          <h2 className="text-2xl font-semibold">
+      <Box
+        id="day-view"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Typography variant="h4" fontWeight={600}>
             {format(date, "MMMM d, yyyy")}
-          </h2>
+          </Typography>
 
-          {/* if special day  */}
           {isSpecialDay && (
-            <div
-              className="relative px-2 before:absolute before:inset-0 before:pointer-events-none before:bg-[repeating-linear-gradient(135deg,transparent,transparent_8px,currentColor_8px,currentColor_9px)] before:opacity-[0.1] hover:before:opacity-[0.5]bg-gradient-to-br from-purple-400/20 to-pink-400/20 border-2 border-purple-500/50 shadow-lg cursor-pointer rounded"
+            <Paper
+              elevation={6}
+              sx={{
+                position: "relative",
+                px: 2,
+                py: 0.5,
+                cursor: "pointer",
+                border: "2px solid",
+                borderColor: deepOrange[500],
+                boxShadow: 2,
+                borderRadius: 2,
+                background: deepOrange[200],
+                color: "black",
+                overflow: "hidden",
+                "&:before": {
+                  content: '""',
+                  position: "absolute",
+                  inset: 0,
+                  pointerEvents: "none",
+                  opacity: 0.1,
+                  transition: "opacity 0.2s",
+                },
+                "&:hover:before": {
+                  opacity: 0.5,
+                },
+                "&:hover": {
+                  borderColor: deepOrange[500],
+                },
+              }}
               onClick={handleSpecialDayClick}
             >
-              {specialDayContent?.title}
-            </div>
+              <Typography variant="subtitle1">
+                {specialDayContent?.title}
+              </Typography>
+            </Paper>
           )}
-        </div>
+        </Box>
 
         {fullDayEvents.length > 0 && (
           <FullDayEvents
@@ -86,7 +125,7 @@ export function DayView({
             content={specialDayContent}
           />
         )}
-      </div>
+      </Box>
     </ErrorBoundary>
   );
 }

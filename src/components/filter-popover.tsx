@@ -1,12 +1,21 @@
-import { motion } from "framer-motion";
-import { Filter } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import {
+  Avatar,
+  Badge,
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
   Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  Typography,
+} from "@mui/material";
+import { grey } from "@mui/material/colors";
+import { useState } from "react";
+import { getBackgroundColor } from "@/utils/color-utils";
 import { FilterPopoverProps } from "@/types/calendar";
 
 export function FilterPopover({
@@ -14,49 +23,99 @@ export function FilterPopover({
   onColorToggle,
   colors,
 }: FilterPopoverProps) {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+
   return (
-    <Popover>
-      <PopoverTrigger asChild>
+    <>
+      <Badge
+        badgeContent={selectedColors.length}
+        color="error"
+        sx={{ "& .MuiBadge-badge": { right: 4, top: 4 } }}
+      >
         <Button
-          variant="outline"
-          size="md"
-          className="relative"
+          variant="outlined"
+          startIcon={<FilterListIcon />}
+          onClick={handleClick}
           disabled={colors.length === 0}
+          sx={{ position: "relative", height: 40 }}
         >
-          <Filter className="h-5 w-5" />
           Filter
-          {selectedColors.length > 0 && (
-            <motion.div
-              className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-zinc-900 dark:bg-zinc-50"
-              layoutId="filterIndicator"
-            />
-          )}
         </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-48 p-0">
-        <span className="flex flex-1 items-center justify-center text-sm font-semibold border-b border-zinc-200 dark:border-zinc-800 p-2">
+      </Badge>
+      <Popover
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        slotProps={{ paper: { sx: { minWidth: 200 } } }}
+      >
+        <Typography
+          sx={{
+            p: 1,
+            textAlign: "center",
+            fontWeight: 600,
+          }}
+        >
           Filter by color
-        </span>
-        <div className="space-y-2 p-1">
+        </Typography>
+        <Divider />
+        <List dense sx={{ p: 0 }}>
           {colors.map((color) => (
-            <label
+            <ListItem
               key={color.value}
-              className="flex items-center space-x-2 rounded-lg p-2 hover:bg-zinc-100 cursor-pointer dark:hover:bg-zinc-800"
+              onClick={() => onColorToggle(color.value)}
+              sx={{
+                ...getBackgroundColor(color.value, 0.7),
+                "&:hover": {
+                  ...getBackgroundColor(color.value),
+                },
+              }}
             >
-              <Checkbox
-                checked={selectedColors.includes(color.value)}
-                onCheckedChange={() => onColorToggle(color.value)}
-              />
-              <div className="flex items-center gap-2">
-                <div
-                  className={`h-4 w-4 rounded-full ${color.bgClass || ""}`}
+              <ListItemIcon sx={{ minWidth: 25 }}>
+                <Checkbox
+                  edge="start"
+                  checked={selectedColors.includes(color.value)}
+                  tabIndex={-1}
+                  disableRipple
+                  sx={{ p: 0.5 }}
+                  slotProps={{
+                    input: {
+                      "aria-labelledby": `checkbox-list-label-${color.value}`,
+                    },
+                  }}
                 />
-                <span>{color.label}</span>
-              </div>
-            </label>
+              </ListItemIcon>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  flex: 1,
+                }}
+              >
+                <ListItemText
+                  id={`checkbox-list-label-${color.value}`}
+                  primary={color.label}
+                  sx={{ m: 0 }}
+                />
+              </Box>
+            </ListItem>
           ))}
-        </div>
-      </PopoverContent>
-    </Popover>
+        </List>
+      </Popover>
+    </>
   );
 }

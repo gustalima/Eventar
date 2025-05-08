@@ -1,13 +1,10 @@
-import { format } from "date-fns";
-import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { Box, Button } from "@mui/material";
+import { grey } from "@mui/material/colors";
+import TextField from "@mui/material/TextField";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { NavigationProps } from "@/types/calendar";
 
 export function Navigation({
@@ -80,50 +77,68 @@ export function Navigation({
   };
 
   return (
-    <div className="flex items-center gap-2" id="navigation">
+    <Box
+      id="navigation"
+      sx={{
+        display: "flex",
+        flexDirection: "row",
+        gap: 1,
+        alignItems: "center",
+      }}
+    >
       <Button
-        variant="outline"
-        size="icon"
+        variant="text"
         onClick={() => navigateDate("prev")}
         disabled={isNavigationDisabled("prev")}
+        sx={{
+          color: grey[700],
+          minWidth: 12,
+          px: 0,
+          border: 1,
+          borderColor: grey[400],
+          height: 40,
+        }}
       >
-        <ChevronLeft className="h-4 w-4" />
+        <ChevronLeftIcon />
       </Button>
-
-      <div className="flex gap-2">
-        <Button variant="outline" className="min-w-[120px] cursor-auto">
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {format(currentDate, "MMMM")}
-        </Button>
-        <Select
-          value={currentDate.getFullYear().toString()}
-          onValueChange={(year) => {
-            const newDate = new Date(currentDate);
-            newDate.setFullYear(Number.parseInt(year));
-            setCurrentDate(newDate);
-          }}
-        >
-          <SelectTrigger className="w-[100px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {availableYears.map((year) => (
-              <SelectItem key={year} value={year.toString()}>
-                {year}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <Box sx={{ width: 200 }}>
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <DatePicker
+            views={["year", "month"]}
+            openTo="month"
+            enableAccessibleFieldDOMStructure={false}
+            format="MMMM - yyyy"
+            value={currentDate}
+            onChange={(newValue) => {
+              if (newValue) setCurrentDate(newValue);
+            }}
+            slots={{ textField: TextField }}
+            slotProps={{
+              textField: (params) => ({
+                ...params,
+                size: "small",
+              }),
+            }}
+          />
+        </LocalizationProvider>
+      </Box>
 
       <Button
-        variant="outline"
-        size="icon"
+        variant="text"
+        size="small"
         onClick={() => navigateDate("next")}
         disabled={isNavigationDisabled("next")}
+        sx={{
+          color: grey[700],
+          minWidth: 12,
+          px: 0,
+          border: 1,
+          borderColor: grey[400],
+          height: 40,
+        }}
       >
-        <ChevronRight className="h-4 w-4" />
+        <ChevronRightIcon />
       </Button>
-    </div>
+    </Box>
   );
 }

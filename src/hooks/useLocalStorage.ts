@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
-export function useLocalStorage<T>(key: string, initialValue: T) {
+export function useSessionStorage<T>(key: string, initialValue: T) {
   const [value, setValue] = useState<T>(() => {
     try {
-      const item = window.localStorage.getItem(key);
+      const item = window.sessionStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
     } catch {
       return initialValue;
@@ -11,17 +11,17 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
   });
 
   useEffect(() => {
-    window.localStorage.setItem(key, JSON.stringify(value));
+    window.sessionStorage.setItem(key, JSON.stringify(value));
   }, [key, value]);
 
   return [value, setValue] as const;
 }
 
 const clearPersistedState = () => {
-  localStorage.removeItem("eventar-selected-colors");
-  localStorage.removeItem("eventar-selected-resource");
-  localStorage.removeItem("eventar-current-view");
-  localStorage.removeItem("eventar-agenda-view");
+  sessionStorage.removeItem("eventar-selected-colors");
+  sessionStorage.removeItem("eventar-selected-resource");
+  sessionStorage.removeItem("eventar-current-view");
+  sessionStorage.removeItem("eventar-agenda-view");
 };
 
 export { clearPersistedState };

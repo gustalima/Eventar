@@ -1,17 +1,21 @@
-import { format } from "date-fns";
-import { AnimatePresence, motion } from "framer-motion";
+import AccessTime from "@mui/icons-material/AccessTime";
+import Check from "@mui/icons-material/Check";
+import ContentCopy from "@mui/icons-material/ContentCopy";
+import LinkIcon from "@mui/icons-material/Link";
+import RoomIcon from "@mui/icons-material/Room";
+import Alert from "@mui/icons-material/WarningAmberOutlined";
 import {
-  AlertCircle,
-  Check,
-  Clock,
-  Copy,
-  LinkIcon,
-  MapPin,
-} from "lucide-react";
+  Box,
+  Button,
+  Chip,
+  Divider,
+  Paper,
+  Stack,
+  Typography,
+} from "@mui/material";
+import { format } from "date-fns";
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { getBackgroundColor } from "@/utils/color-utils";
 import { CalendarEvent } from "@/types/calendar";
 
 export default function SimpleEventModal({ event }: { event: CalendarEvent }) {
@@ -40,160 +44,187 @@ export default function SimpleEventModal({ event }: { event: CalendarEvent }) {
     return `${hours}h ${minutes}m`;
   };
 
-  const DEFAULT_BACKGROUND_COLORS = {
-    blue: { label: "Blue", bgClass: "bg-blue-500 dark:bg-blue-900" },
-    green: { label: "Green", bgClass: "bg-green-500 dark:bg-green-900" },
-    yellow: { label: "Yellow", bgClass: "bg-yellow-500 dark:bg-yellow-900" },
-    purple: { label: "Purple", bgClass: "bg-purple-500 dark:bg-purple-900" },
-    red: { label: "Red", bgClass: "bg-red-500 dark:bg-red-900" },
-    orange: { label: "Orange", bgClass: "bg-orange-500 dark:bg-orange-900" },
-  } as const;
-
   return (
-    <AnimatePresence>
-      <motion.div
-        className="w-full max-w-2xl bg-white rounded-xl shadow-lg z-50 overflow-hidden dark:bg-zinc-950"
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-      >
-        {/* Header with color strip */}
-        <div
-          className={`h-2 w-full ${
-            DEFAULT_BACKGROUND_COLORS[event.color ?? "blue"].bgClass
-          }`}
-        />
+    <Paper
+      elevation={1}
+      sx={{
+        width: "100%",
+        maxWidth: 600,
+        bgcolor: "background.paper",
+        borderRadius: 3,
+        boxShadow: 6,
+        zIndex: 50,
+        overflow: "hidden",
+      }}
+    >
+      {/* Header with color strip */}
+      <Box sx={{ height: 8, width: "100%" }} />
 
-        {/* Main content */}
-        <div className="p-6">
-          <div className="flex items-start justify-between">
-            <div className="space-y-1">
-              <h2 className="font-semibold text-lg">{event.title}</h2>
-              <div className="flex items-center gap-2">
-                {event.course && (
-                  <Badge variant="secondary">{event.course}</Badge>
+      {/* Main content */}
+      <Box sx={{ p: 4 }}>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="flex-start"
+        >
+          <Box sx={{ ...getBackgroundColor(event.color, 0.7) }}>
+            <Typography variant="h6" fontWeight={600}>
+              {event.title}
+            </Typography>
+            <Stack direction="row" spacing={1} mt={1}>
+              {event.course && (
+                <Chip label={event.course} size="small" color="default" />
+              )}
+              {event.batch && (
+                <Chip label={event.batch} size="small" color="default" />
+              )}
+            </Stack>
+          </Box>
+        </Stack>
+
+        <Divider sx={{ my: 3 }} />
+
+        <Stack spacing={3}>
+          {/* Time and Date */}
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <Box
+              sx={{
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                bgcolor: "grey.200",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <AccessTime />
+            </Box>
+            <Box>
+              <Typography fontWeight={500}>
+                {event.isFullDay ? (
+                  format(new Date(event.start), "EEEE, MMMM d, yyyy")
+                ) : (
+                  <>
+                    {format(new Date(event.start), "EEEE, MMMM d, yyyy")}
+                    <br />
+                    {format(new Date(event.start), "HH:mm")} -{" "}
+                    {format(new Date(event.end), "HH:mm")}{" "}
+                    {event.duration ? (
+                      <Typography
+                        component="span"
+                        variant="caption"
+                        color="text.secondary"
+                      >
+                        ({getTimeFormatFromDuration(event.duration)})
+                      </Typography>
+                    ) : (
+                      <Typography
+                        component="span"
+                        variant="caption"
+                        color="text.secondary"
+                      >
+                        (
+                        {calculateDuration(
+                          event.start.toString(),
+                          event.end.toString()
+                        )}
+                        )
+                      </Typography>
+                    )}
+                  </>
                 )}
-                {event.batch && (
-                  <Badge variant="secondary">{event.batch}</Badge>
-                )}
-              </div>
-            </div>
-          </div>
+              </Typography>
+              {event.recurring && (
+                <Typography variant="body2" color="text.secondary">
+                  Recurring event
+                </Typography>
+              )}
+            </Box>
+          </Stack>
 
-          <Separator className="my-4" />
+          {/* Location if available */}
+          {event.location && (
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <Box
+                sx={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                  bgcolor: "grey.200",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <RoomIcon />
+              </Box>
+              <Box>
+                <Typography fontWeight={500}>{event.location}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {event.locationDetail}
+                </Typography>
+              </Box>
+            </Stack>
+          )}
 
-          <div className="grid gap-4">
-            {/* Time and Date */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-zinc-900/10 flex items-center justify-center dark:bg-zinc-50/10">
-                <Clock className="h-5 w-5 text-zinc-900 dark:text-zinc-50" />
-              </div>
-              <div>
-                <p className="font-medium">
-                  {event.isFullDay ? (
-                    format(new Date(event.start), "EEEE, MMMM d, yyyy")
-                  ) : (
-                    <>
-                      {format(new Date(event.start), "EEEE, MMMM d, yyyy")}
-                      <br />
-                      {format(new Date(event.start), "HH:mm")} -{" "}
-                      {format(new Date(event.end), "HH:mm")}{" "}
-                      {event.duration ? (
-                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                          ({getTimeFormatFromDuration(event.duration)})
-                        </span>
-                      ) : (
-                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                          (
-                          {calculateDuration(
-                            event.start.toString(),
-                            event.end.toString()
-                          )}
-                          )
-                        </span>
-                      )}
-                    </>
-                  )}
-                </p>
-                {event.recurring && (
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                    Recurring event
-                  </p>
-                )}
-              </div>
-            </div>
+          {/* Description */}
+          {event.description && (
+            <Box mt={2}>
+              <Typography fontWeight={500}>Description</Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ whiteSpace: "pre-wrap" }}
+              >
+                {event.description}
+              </Typography>
+            </Box>
+          )}
 
-            {/* Location if available */}
-            {event.location && (
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-zinc-900/10 flex items-center justify-center dark:bg-zinc-50/10">
-                  <MapPin className="h-5 w-5 text-zinc-900 dark:text-zinc-50" />
-                </div>
-                <div>
-                  <p className="font-medium">{event.location}</p>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                    {event.locationDetail}
-                  </p>
-                </div>
-              </div>
-            )}
+          {/* Additional Info */}
+          {event.additionalInfo && (
+            <Box
+              mt={2}
+              p={2}
+              borderRadius={2}
+              bgcolor="grey.100"
+              display="flex"
+              alignItems="center"
+              gap={1}
+            >
+              <Alert style={{ marginRight: 8 }} />
+              <Typography variant="body2">{event.additionalInfo}</Typography>
+            </Box>
+          )}
+        </Stack>
 
-            {/* Description */}
-            {event.description && (
-              <div className="mt-4 space-y-2">
-                <h3 className="font-medium">Description</h3>
-                <p className="text-sm text-zinc-500 whitespace-pre-wrap dark:text-zinc-400">
-                  {event.description}
-                </p>
-              </div>
-            )}
-
-            {/* Additional Info */}
-            {event.additionalInfo && (
-              <div className="mt-4 p-4 rounded-lg bg-zinc-100 dark:bg-zinc-800">
-                <div className="flex items-center gap-2 text-sm">
-                  <AlertCircle className="h-4 w-4" />
-                  <p>{event.additionalInfo}</p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="mt-6 flex items-center gap-2">
-            {event.meetingLink && (
-              <>
-                <Button
-                  variant="outline"
-                  className="flex-1 rounded"
-                  disabled={event.meetingLink.length === 0}
-                  onClick={() => window.open(event.meetingLink, "_blank")}
-                >
-                  <LinkIcon className="mr-2 h-4 w-4" />
-                  Join Meeting
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleCopyLink}
-                  className="rounded"
-                >
-                  {copied ? (
-                    <div className="flex items-center gap-1">
-                      <span>Copied</span>
-                      <Check className="h-4 w-4" />
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1">
-                      <span>Copy Link</span>
-                      <Copy className="h-4 w-4" />
-                    </div>
-                  )}
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-      </motion.div>
-    </AnimatePresence>
+        {/* Action Buttons */}
+        <Stack direction="row" spacing={2} mt={5}>
+          {event.meetingLink && (
+            <>
+              <Button
+                variant="outlined"
+                fullWidth
+                disabled={event.meetingLink.length === 0}
+                onClick={() => window.open(event.meetingLink, "_blank")}
+                startIcon={<LinkIcon />}
+                sx={{ borderRadius: 2 }}
+              >
+                Join Meeting
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={handleCopyLink}
+                sx={{ borderRadius: 2, minWidth: 120 }}
+                startIcon={copied ? <Check /> : <ContentCopy />}
+              >
+                {copied ? "Copied" : "Copy Link"}
+              </Button>
+            </>
+          )}
+        </Stack>
+      </Box>
+    </Paper>
   );
 }

@@ -1,5 +1,7 @@
 import { DayCell } from "@/views/month-view/day-cell";
 import { WeekDaysHeader } from "@/views/month-view/week-days-header";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { getEventsForDate } from "@/utils/calendar-utils";
 import { getMonthDays, isSpecialDay } from "@/utils/date-utils";
@@ -14,31 +16,51 @@ export function MonthView({
   handleEventClick,
   handleDayClick,
   specialDays,
+  startOfWeek,
 }: MonthViewProps) {
-  const days = getMonthDays(year, month);
+  const days = [...getMonthDays(year, month, startOfWeek)];
 
   return (
     <ErrorBoundary>
-      <div className="flex flex-col" id="month-view">
-        <div className="grid grid-cols-7 border border-zinc-200 rounded-lg bg-white dark:border-zinc-800 dark:bg-zinc-950">
-          <WeekDaysHeader date={date} />
-          {days.map((date, index) => (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+        }}
+        id="month-view"
+      >
+        <Paper
+          elevation={0}
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(7, 1fr)",
+            border: 1,
+            borderColor: "divider",
+            borderRadius: 2,
+            backgroundColor: "background.paper",
+            overflow: "hidden",
+            minHeight: 0,
+          }}
+        >
+          <WeekDaysHeader startOfWeek={startOfWeek} />
+          {days.map((mappedDate, index) => (
             <DayCell
-              key={date.toString()}
+              key={mappedDate.toString()}
               date={date}
+              mappedDate={mappedDate}
               index={index}
-              events={getEventsForDate(date, events)}
+              events={getEventsForDate(mappedDate, events)}
               showPastDates={showPastDates}
               handleEventClick={handleEventClick}
               handleDayClick={handleDayClick}
-              isSpecialDay={isSpecialDay(date, specialDays ?? [])}
+              isSpecialDay={isSpecialDay(mappedDate, specialDays ?? [])}
               specialDayContent={specialDays?.find((day) =>
-                isSpecialDay(date, [day])
+                isSpecialDay(mappedDate, [day])
               )}
             />
           ))}
-        </div>
-      </div>
+        </Paper>
+      </Box>
     </ErrorBoundary>
   );
 }

@@ -6,8 +6,8 @@ import { CalendarEvent } from "./types/calendar";
 import { Modals } from "./types/modals.types";
 import { SpinnerVariant } from "./types/spinner.types";
 import {
-  getEventBackgroundColorClass,
-  getEventColorClass,
+  getEventBackgroundColorStyle,
+  getEventColorStyle,
 } from "./utils/color-utils";
 
 export {
@@ -16,8 +16,8 @@ export {
   Eventar,
   SpinnerVariant,
   DEFAULT_BACKGROUND_COLORS,
-  getEventColorClass,
-  getEventBackgroundColorClass,
+  getEventColorStyle as getEventColorClass,
+  getEventBackgroundColorStyle as getEventBackgroundColorClass,
   Modals,
 };
 
