@@ -58,6 +58,7 @@ export interface ErrorBoundaryState {
 }
 
 export interface FilterPopoverProps {
+  resources: Resource[];
   selectedColors: string[];
   onColorToggle: (color: string) => void;
   colors: FilterColors[];

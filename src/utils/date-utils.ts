@@ -21,14 +21,12 @@ export function getDateClassName(
         return {
           opacity: showPastDates ? 1 : 0.5,
           pointerEvents: showPastDates ? null : "none",
-          cursor: showPastDates ? "pointer" : null,
           color: showPastDates ? null : "#9ca3af",
         };
       case "year":
         return {
           opacity: showPastDates ? 1 : 0.4,
           pointerEvents: showPastDates ? null : "none",
-          cursor: showPastDates ? "pointer" : null,
           color: showPastDates ? null : "#9ca3af",
         };
     }

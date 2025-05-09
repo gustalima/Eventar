@@ -1,6 +1,5 @@
 import FilterListIcon from "@mui/icons-material/FilterList";
 import {
-  Avatar,
   Badge,
   Box,
   Button,
@@ -13,12 +12,12 @@ import {
   Popover,
   Typography,
 } from "@mui/material";
-import { grey } from "@mui/material/colors";
 import { useState } from "react";
 import { getBackgroundColor } from "@/utils/color-utils";
 import { FilterPopoverProps } from "@/types/calendar";
 
 export function FilterPopover({
+  resources,
   selectedColors,
   onColorToggle,
   colors,
@@ -34,6 +33,8 @@ export function FilterPopover({
   };
 
   const open = Boolean(anchorEl);
+
+  console.log({ resources });
 
   return (
     <>
@@ -108,7 +109,11 @@ export function FilterPopover({
               >
                 <ListItemText
                   id={`checkbox-list-label-${color.value}`}
-                  primary={color.label}
+                  primary={
+                    resources.find(
+                      (rs) => rs.color === color.label.toLowerCase()
+                    )?.name || color.label
+                  }
                   sx={{ m: 0 }}
                 />
               </Box>

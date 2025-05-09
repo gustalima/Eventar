@@ -92,6 +92,7 @@ export function CalendarHeader({
             />
 
             <FilterPopover
+              resources={resources}
               selectedColors={selectedColors}
               onColorToggle={onColorToggle}
               colors={availableColors}

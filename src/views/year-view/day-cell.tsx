@@ -24,7 +24,7 @@ export const DayCell = memo(function DayCell({
     date.toLocaleString("default", { month: "long" }) === month;
   const hasEvents = dateEvents.length > 0;
 
-  const handleSpecialDayClick = () => {
+  const handleSpecialDayClick = (e) => {
     if (isSpecialDay) {
       setIsModalOpen(true);
     }
@@ -42,6 +42,7 @@ export const DayCell = memo(function DayCell({
             p: 0.5,
             borderRadius: 1,
             position: "relative",
+            cursor: "pointer",
             ...(!isSameMonth ? { backgroundColor: grey[200] } : {}),
             ...(hasEvents
               ? {
@@ -56,6 +57,7 @@ export const DayCell = memo(function DayCell({
               : {
                   border: "1px dashed",
                   borderColor: "divider",
+                  ...(isSpecialDay ? { backgroundColor: deepOrange[100] } : {}),
                   "&:hover": {
                     borderColor: isSpecialDay ? deepOrange[500] : blue[500],
                   },
