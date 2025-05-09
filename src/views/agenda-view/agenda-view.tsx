@@ -17,7 +17,7 @@ export const AgendaView = ({ events, handleEventClick }: AgendaViewProps) => {
     <Box sx={{ width: "100%" }}>
       <Box sx={{ mb: 6, px: 2 }}>
         <Typography variant="h4" fontWeight="bold" color="grey.800">
-          Agenda View
+          Schedule View
         </Typography>
         <Typography color="grey.600" mt={1}>
           View your upcoming events in chronological order

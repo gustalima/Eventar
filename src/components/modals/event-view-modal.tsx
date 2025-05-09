@@ -73,10 +73,11 @@ export function EventViewModal({
         <>
           <DialogTitle
             sx={{
-              pb: 0.5,
+              py: 1,
+              minHeight: 60,
               display: "flex",
               justifyContent: "space-between",
-              alignItems: "start",
+              alignItems: "center",
               ...(modalConfig.showModalHeaderStrip &&
                 getBackgroundColor(event.color)),
             }}
@@ -85,14 +86,18 @@ export function EventViewModal({
               <Typography variant="h6" sx={{ fontWeight: "bold" }}>
                 {event.title} @ {event.resourceId}
               </Typography>
-              <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+              <Stack direction="row" spacing={1}>
                 {event.status && <Chip label={event.status} size="small" />}
                 {event.isFullDay && (
-                  <Chip label="All Day" variant="outlined" size="small" />
+                  <Chip label="All Day" size="small" color={"success"} />
                 )}
               </Stack>
             </Box>
-            <IconButton onClick={onClose} size="small">
+            <IconButton
+              onClick={onClose}
+              size="small"
+              sx={{ alignSelf: "center" }}
+            >
               <CloseIcon />
             </IconButton>
           </DialogTitle>
@@ -164,7 +169,7 @@ export function EventViewModal({
                       width: 40,
                       height: 40,
                       borderRadius: "50%",
-                      backgroundColor: "action.hover",
+                      backgroundColor: grey[200],
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -203,7 +208,7 @@ export function EventViewModal({
                   elevation={0}
                   sx={{
                     p: 2,
-                    backgroundColor: "action.selected",
+                    backgroundColor: grey[200],
                     borderRadius: 2,
                     display: "flex",
                     alignItems: "center",
@@ -218,8 +223,8 @@ export function EventViewModal({
               )}
             </Stack>
           </DialogContent>
-          <DialogActions>
-            {event.meetingLink && (
+          {event.meetingLink && (
+            <DialogActions>
               <Button
                 variant="outlined"
                 startIcon={<LinkIcon />}
@@ -229,8 +234,8 @@ export function EventViewModal({
               >
                 {modalConfig.actionButtonName}
               </Button>
-            )}
-          </DialogActions>
+            </DialogActions>
+          )}
         </>
       ) : (
         <Box>{customComponent(event)}</Box>

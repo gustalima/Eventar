@@ -1,4 +1,5 @@
 import { CalendarView, SpecialDay } from "@/types/calendar";
+import { Weeks } from "@/constants/calendar";
 
 export function isPastDate(date: Date) {
   const today = new Date();
@@ -18,15 +19,17 @@ export function getDateClassName(
       case "week":
       case "month":
         return {
-          opacity: 0.5,
-          pointerEvents: "none",
-          color: "#9ca3af",
+          opacity: showPastDates ? 1 : 0.5,
+          pointerEvents: showPastDates ? null : "none",
+          cursor: showPastDates ? "pointer" : null,
+          color: showPastDates ? null : "#9ca3af",
         };
       case "year":
         return {
-          opacity: 0.4,
-          pointerEvents: "none",
-          color: "#9ca3af",
+          opacity: showPastDates ? 1 : 0.4,
+          pointerEvents: showPastDates ? null : "none",
+          cursor: showPastDates ? "pointer" : null,
+          color: showPastDates ? null : "#9ca3af",
         };
     }
   }
@@ -36,7 +39,7 @@ export function getDateClassName(
 export function getMonthDays(
   year: number,
   month: number,
-  startOfWeek: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun" = "Mon"
+  startOfWeek: Weeks = Weeks.MONDAY
 ): Date[] {
   const days: Date[] = [];
   const weekDays = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];

@@ -1,4 +1,5 @@
 import { JSX } from "react";
+import { Weeks } from "@/constants/calendar";
 import { SpinnerVariant } from "./spinner.types";
 
 export type CalendarEvent = {
@@ -79,7 +80,7 @@ export interface EventarProps {
   showClock?: boolean;
   resources?: Resource[];
   specialDays?: SpecialDay[];
-  startOfWeek?: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
+  startOfWeek?: Weeks;
 }
 
 export interface RenderViewProps {
@@ -97,7 +98,7 @@ export interface RenderViewProps {
   setIsEventModalOpen: (isOpen: boolean) => void;
   agendaView: boolean;
   specialDays: SpecialDay[];
-  startOfWeek: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
+  startOfWeek: Weeks;
 }
 
 export interface CalendarHeaderProps {

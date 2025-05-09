@@ -1,3 +1,4 @@
+import { Weeks } from "@/constants/calendar";
 import { CalendarEvent, SpecialDay } from "./calendar";
 
 export interface YearViewProps {
@@ -7,7 +8,7 @@ export interface YearViewProps {
   handleEventClick?: (e: React.MouseEvent, event: CalendarEvent) => void;
   isLoading?: boolean;
   specialDays?: SpecialDay[];
-  startOfWeek: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
+  startOfWeek: Weeks;
 }
 
 export interface YearViewDayCellProps {

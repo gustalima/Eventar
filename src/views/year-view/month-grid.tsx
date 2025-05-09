@@ -3,12 +3,10 @@ import Typography from "@mui/material/Typography";
 import { memo } from "react";
 import { getMonthDays, isSpecialDay } from "@/utils/date-utils";
 import { MonthGridProps } from "@/types/month";
-import { WEEKDAYS } from "@/constants/calendar";
+import { WEEKDAYS, Weeks } from "@/constants/calendar";
 import { DayCell } from "./day-cell";
 
-const getAlignedWeekdays = (
-  startOfWeek: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun"
-) => {
+const getAlignedWeekdays = (startOfWeek: Weeks) => {
   const startIndex = WEEKDAYS.indexOf(startOfWeek.slice(0, 2));
   if (startIndex === -1) return WEEKDAYS;
   return [...WEEKDAYS.slice(startIndex), ...WEEKDAYS.slice(0, startIndex)];

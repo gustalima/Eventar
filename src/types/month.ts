@@ -1,3 +1,4 @@
+import { Weeks } from "@/constants/calendar";
 import { CalendarEvent, SpecialDay } from "./calendar";
 
 export interface MonthViewProps {
@@ -10,7 +11,7 @@ export interface MonthViewProps {
   handleEventClick?: (e: React.MouseEvent, event: CalendarEvent) => void;
   handleDayClick?: (date: Date) => void;
   specialDays?: SpecialDay[];
-  startOfWeek: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
+  startOfWeek: Weeks;
 }
 
 export interface MonthGridProps {
@@ -21,5 +22,5 @@ export interface MonthGridProps {
   showPastDates: boolean;
   handleEventClick?: (e: React.MouseEvent, event: CalendarEvent) => void;
   specialDays?: SpecialDay[];
-  startOfWeek: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
+  startOfWeek: Weeks;
 }

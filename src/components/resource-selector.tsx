@@ -50,7 +50,10 @@ export function ResourceSelector({
   selectedResource,
   onResourceChange,
 }: ResourceSelectorProps) {
-  const groupedResources = Object.groupBy(resources, (r) => r.type);
+  const groupedResources: Partial<Record<string, Resource[]>> = Object.groupBy(
+    resources,
+    (r) => r.type
+  );
 
   const renderMenuItems = () => {
     if (!resources || resources.length === 0) {

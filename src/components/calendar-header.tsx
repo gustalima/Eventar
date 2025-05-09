@@ -1,10 +1,5 @@
-import {
-  Box,
-  Button,
-  FormControlLabel,
-  Switch,
-  Typography,
-} from "@mui/material";
+import EventNoteIcon from "@mui/icons-material/EventNote";
+import { Box, Button, Typography } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { useEffect, useState } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
@@ -101,19 +96,7 @@ export function CalendarHeader({
               onColorToggle={onColorToggle}
               colors={availableColors}
             />
-            {showAgenda && (
-              <FormControlLabel
-                sx={{ ml: 0.5 }}
-                control={
-                  <Switch
-                    checked={agendaView}
-                    onClick={() => handleAgendaView?.(!showAgenda)}
-                    slotProps={{ input: { "aria-label": "controlled" } }}
-                  />
-                }
-                label="Agenda"
-              />
-            )}
+
             <Button
               onClick={handleTodayClick}
               sx={{ height: 40 }}
@@ -131,6 +114,17 @@ export function CalendarHeader({
               setView={setView}
               showViewOptions={showViewOptions}
             />
+            {showAgenda && (
+              <Button
+                disableElevation
+                onClick={() => handleAgendaView?.(!showAgenda)}
+                variant={agendaView ? "contained" : "outlined"}
+                sx={{ height: 40 }}
+                startIcon={<EventNoteIcon />}
+              >
+                Schedule
+              </Button>
+            )}
           </Box>
         </Box>
       </Box>
