@@ -18,6 +18,7 @@ export function CalendarHeader({
   onColorToggle,
   navigation,
   showViewOptions,
+  setIsNewEventOpen,
   yearRange,
   availableColors,
   showAgenda,
@@ -85,6 +86,15 @@ export function CalendarHeader({
               marginLeft: "auto",
             }}
           >
+            <Button
+              onClick={() => setIsNewEventOpen(true)}
+              variant="contained"
+              sx={{ height: 40 }}
+              disableElevation
+              startIcon={<EventNoteIcon />}
+            >
+              New Event
+            </Button>
             <ResourceSelector
               resources={resources}
               selectedResource={selectedResource}

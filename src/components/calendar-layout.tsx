@@ -12,6 +12,7 @@ import type {
   FilterColors,
 } from "@/types/calendar";
 import { SpinnerVariant } from "@/types/spinner.types";
+import { Weeks } from "@/constants/calendar";
 import { DEFAULT_FILTER_COLORS } from "../constants/colors";
 import { CalendarHeader } from "./calendar-header";
 import { ErrorBoundary } from "./error-boundary";
@@ -21,6 +22,7 @@ import { RenderView } from "./render-view";
 
 export function Eventar({
   events,
+  setEvents,
   navigation = true,
   views = ["day", "month"],
   defaultView = "month",
@@ -36,7 +38,7 @@ export function Eventar({
   showClock = false,
   resources = [],
   specialDays = [],
-  startOfWeek = "Mon",
+  startOfWeek = Weeks.MONDAY,
 }: EventarProps) {
   const darkTheme = createTheme({
     palette: {
@@ -49,6 +51,7 @@ export function Eventar({
   );
   const [isDayModalOpen, setIsDayModalOpen] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [isNewEventOpen, setIsNewEventOpen] = useState(false);
   const [selectedColors, setSelectedColors] = useSessionStorage<string[]>(
     "eventar-selected-colors",
     []
@@ -143,6 +146,7 @@ export function Eventar({
               resources={resources}
               selectedResource={selectedResource}
               onResourceChange={setSelectedResource}
+              setIsNewEventOpen={setIsNewEventOpen}
             />
 
             <Box>
@@ -151,6 +155,7 @@ export function Eventar({
                   view={view}
                   currentDate={currentDate}
                   filteredEvents={filteredEvents}
+                  // setEvents={setEvents}
                   showPastDates={showPastDates}
                   customEventViewer={customEventViewer}
                   isLoading={isLoading}
@@ -193,6 +198,13 @@ export function Eventar({
             defaultModalConfig={defaultModalConfig}
           />
         )}
+
+        {isNewEventOpen && (
+          <EventViewModal
+            event={null}
+            isOpen={isNewEventOpen}
+
+        }
       </ThemeProvider>
     </Fragment>
   );

@@ -66,6 +66,7 @@ export interface FilterPopoverProps {
 
 export interface EventarProps {
   events: CalendarEvent[];
+  setEvents: (events: CalendarEvent[]) => void;
   views: CalendarView[];
   isLoading: boolean;
   error: string;
@@ -106,6 +107,7 @@ export interface CalendarHeaderProps {
   view: CalendarView;
   setView: (view: CalendarView) => void;
   currentDate: Date;
+  setIsNewEventOpen: (isOpen: boolean) => void;
   setCurrentDate: (date: Date) => void;
   selectedColors: string[];
   onColorToggle: (color: string) => void;
